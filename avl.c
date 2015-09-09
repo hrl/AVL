@@ -19,6 +19,7 @@ int avl_init(Tree **self){
     }
 
     (*self)->data = NULL;
+    (*self)->height = 1;
     (*self)->left = NULL;
     (*self)->right = NULL;
 
