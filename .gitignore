@@ -1,3 +1,9 @@
+# Test File
+test_*
+
+# IDE
+.idea/
+
 # Object files
 *.o
 *.ko
