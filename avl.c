@@ -24,3 +24,50 @@ int avl_init(Tree **self){
 
     return TREE_OP_SUCCESS;
 }
+
+int avl_del(Tree **self){
+    if((*self) == NULL){
+        return TREE_OP_SUCCESS;
+    }
+
+    avl_del(&((*self)->left));
+    avl_del(&((*self)->right));
+    free(*self);
+    *self = NULL;
+
+    return TREE_OP_SUCCESS;
+}
+
+int avl_height(Tree **self, int *height){
+    // tmp handle
+    *height = (*self)->height;
+    return TREE_OP_SUCCESS;
+}
+
+int avl_search(Tree **self, void *data, Tree **result, int (*compar)(const void *, const void *)){
+    return TREE_OP_SUCCESS;
+}
+
+int avl_insert(Tree **self, void *data, int (*compar)(const void *, const void *)){
+    return TREE_OP_SUCCESS;
+}
+
+int avl_delete(Tree **self, void *data, int (*compar)(const void *, const void *)){
+    return TREE_OP_SUCCESS;
+}
+
+int avl_pre_order_traversal(Tree **self, int (*callback)(const Tree *)){
+    return TREE_OP_SUCCESS;
+}
+
+int avl_in_order_traversal(Tree **self, int (*callback)(const Tree *)){
+    return TREE_OP_SUCCESS;
+}
+
+int avl_post_order_traversal(Tree **self, int (*callback)(const Tree *)){
+    return TREE_OP_SUCCESS;
+}
+
+int avl_level_order_traversal(Tree **self, int (*callback)(const Tree *)){
+    return TREE_OP_SUCCESS;
+}
