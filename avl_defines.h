@@ -5,6 +5,8 @@
 #ifndef AVL_AVL_DEFINES_H
 #define AVL_AVL_DEFINES_H
 
+#define TREE_MAX_SIZE 1000
+
 enum {
     TREE_OP_SUCCESS,
     TREE_INITED_ERROR,

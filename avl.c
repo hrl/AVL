@@ -72,17 +72,102 @@ int avl_delete(Tree **self, void *data, int (*compar)(const void *, const void *
 }
 
 int avl_pre_order_traversal(Tree **self, int (*callback)(const void *)){
+    if(*self == NULL){
+        return TREE_UNINIT_ERROR;
+    }
+
+    int result=TREE_OP_SUCCESS;
+
+    result = (*callback)((*self)->data);
+    if(result != TREE_OP_SUCCESS)return result;
+
+    if((*self)->left != NULL){
+        result = avl_pre_order_traversal(&((*self)->left), callback);
+        if(result != TREE_OP_SUCCESS)return result;
+    }
+
+    if((*self)->right != NULL){
+        result = avl_pre_order_traversal(&((*self)->right), callback);
+        if(result != TREE_OP_SUCCESS)return result;
+    }
+
     return TREE_OP_SUCCESS;
 }
 
 int avl_in_order_traversal(Tree **self, int (*callback)(const void *)){
+    if(*self == NULL){
+        return TREE_UNINIT_ERROR;
+    }
+
+    int result=TREE_OP_SUCCESS;
+
+    if((*self)->left != NULL){
+        result = avl_in_order_traversal(&((*self)->left), callback);
+        if(result != TREE_OP_SUCCESS)return result;
+    }
+
+    result = (*callback)((*self)->data);
+    if(result != TREE_OP_SUCCESS)return result;
+
+    if((*self)->right != NULL){
+        result = avl_in_order_traversal(&((*self)->right), callback);
+        if(result != TREE_OP_SUCCESS)return result;
+    }
+
     return TREE_OP_SUCCESS;
 }
 
 int avl_post_order_traversal(Tree **self, int (*callback)(const void *)){
+    if(*self == NULL){
+        return TREE_UNINIT_ERROR;
+    }
+
+    int result=TREE_OP_SUCCESS;
+
+    if((*self)->left != NULL){
+        result = avl_post_order_traversal(&((*self)->left), callback);
+        if(result != TREE_OP_SUCCESS)return result;
+    }
+
+    if((*self)->right != NULL){
+        result = avl_post_order_traversal(&((*self)->right), callback);
+        if(result != TREE_OP_SUCCESS)return result;
+    }
+
+    result = (*callback)((*self)->data);
+    if(result != TREE_OP_SUCCESS)return result;
+
     return TREE_OP_SUCCESS;
 }
 
 int avl_level_order_traversal(Tree **self, int (*callback)(const void *)){
+    if(*self == NULL){
+        return TREE_UNINIT_ERROR;
+    }
+
+    int result=TREE_OP_SUCCESS;
+
+    Tree* queue[TREE_MAX_SIZE];
+    int first=0;
+    int last=0;
+
+    queue[first] = *self;
+    first++;
+
+    while(first != last){
+        result = (*callback)(queue[last]->data);
+        if(result != TREE_OP_SUCCESS)return result;
+        last++;
+
+        if(queue[last]->left != NULL){
+            queue[first] = queue[last]->left;
+            first++;
+        }
+        if(queue[last]->right != NULL){
+            queue[first] = queue[last]->right;
+            first++;
+        }
+    }
+
     return TREE_OP_SUCCESS;
 }
