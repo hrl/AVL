@@ -9,7 +9,7 @@
 
 int avl_init(Tree **self);
 int avl_del(Tree **self);
-int avl_height(Tree **self, int *height);
+int avl_height_direct(Tree *self);
 int avl_search(Tree **self, void *data, Tree **result, int (*compar)(const void *, const void *));
 int avl_insert(Tree **self, void *data, int (*compar)(const void *, const void *));
 int avl_delete(Tree **self, void *data, int (*compar)(const void *, const void *));

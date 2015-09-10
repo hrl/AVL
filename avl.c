@@ -8,6 +8,10 @@
 #include "avl_structs.h"
 #include "avl_defines.h"
 
+int _max(int a, int b){
+    return a>b?a:b;
+}
+
 int avl_init(Tree **self){
     if(*self != NULL){
         return TREE_INITED_ERROR;
@@ -39,10 +43,11 @@ int avl_del(Tree **self){
     return TREE_OP_SUCCESS;
 }
 
-int avl_height(Tree **self, int *height){
-    // tmp handle
-    *height = (*self)->height;
-    return TREE_OP_SUCCESS;
+int avl_height_direct(Tree *self){
+    if(self == NULL){
+        return 0;
+    }
+    return self->height;
 }
 
 int avl_search(Tree **self, void *data, Tree **result, int (*compar)(const void *, const void *)){
@@ -63,7 +68,105 @@ int avl_search(Tree **self, void *data, Tree **result, int (*compar)(const void 
     return TREE_OP_SUCCESS;
 }
 
+int _avl_single_rotate_with_left(Tree **self){
+    Tree *tmp;
+    tmp = (*self)->left;
+    (*self)->left = tmp->right;
+    tmp->right = *self;
+    *self = tmp;
+
+    tmp = (*self)->right;
+    tmp->height = _max(avl_height_direct(tmp->left), avl_height_direct(tmp->right)) + 1;
+    (*self)->height = _max(avl_height_direct((*self)->left), avl_height_direct((*self)->right)) + 1;
+    return TREE_OP_SUCCESS;
+}
+
+int _avl_single_rotate_with_right(Tree **self){
+    Tree *tmp;
+    tmp = (*self)->right;
+    (*self)->right = tmp->left;
+    tmp->left = *self;
+    *self = tmp;
+
+    tmp = (*self)->left;
+    tmp->height = _max(avl_height_direct(tmp->left), avl_height_direct(tmp->right)) + 1;
+    (*self)->height = _max(avl_height_direct((*self)->left), avl_height_direct((*self)->right)) + 1;
+    return TREE_OP_SUCCESS;
+}
+
+int _avl_double_rotate_with_left(Tree **self){
+    int result=TREE_OP_SUCCESS;
+    result = _avl_single_rotate_with_right(&((*self)->left));
+    if(result != TREE_OP_SUCCESS)return result;
+    return _avl_single_rotate_with_left(self);
+}
+
+int _avl_double_rotate_with_right(Tree **self){
+    int result;
+    result = _avl_single_rotate_with_left(&((*self)->right));
+    if(result != TREE_OP_SUCCESS)return result;
+    return _avl_single_rotate_with_right(self);
+}
+
+int _avl_direct_init(Tree **self, void *data) {
+    int result=TREE_OP_SUCCESS;
+    result = avl_init(self);
+
+    if(result == TREE_INIT_FAIL_ERROR){
+        result = TREE_INSERT_FAIL_ERROR;
+    }
+
+    (*self)->data = data;
+
+    return result;
+}
+
 int avl_insert(Tree **self, void *data, int (*compar)(const void *, const void *)){
+    if(*self == NULL){
+        return TREE_UNINIT_ERROR;
+    }
+
+    int result=TREE_OP_SUCCESS;
+
+    int compar_result=(*compar)(data, (*self)->data);
+    if(compar_result == 0) {
+        return TREE_INSERT_SAME_VALUE_ERROR;
+    }
+    if(compar_result < 0){
+        if((*self)->left == NULL){
+            Tree *new_tree=NULL;
+            result = _avl_direct_init(&new_tree, data);
+            if(result != TREE_OP_SUCCESS)return result;
+        } else {
+            result = avl_insert(&((*self)->left), data, compar);
+            if(result != TREE_OP_SUCCESS)return result;
+            if(avl_height_direct((*self)->left) - avl_height_direct((*self)->right) == 2){
+                if((*compar)(data, (*self)->left->data) < 0){
+                    result = _avl_single_rotate_with_left(self);
+                } else {
+                    result = _avl_double_rotate_with_left(self);
+                }
+                if(result != TREE_OP_SUCCESS)return result;
+            }
+        }
+    } else {
+        if((*self)->right == NULL){
+            Tree *new_tree=NULL;
+            result = _avl_direct_init(&new_tree, data);
+            if(result != TREE_OP_SUCCESS)return result;
+        } else {
+            result = avl_insert(&((*self)->right), data, compar);
+            if(result != TREE_OP_SUCCESS)return result;
+            if(avl_height_direct((*self)->right) - avl_height_direct((*self)->left) == 2){
+                if((*compar)(data, (*self)->right->data) > 0){
+                    result = _avl_single_rotate_with_right(self);
+                } else {
+                    result = _avl_double_rotate_with_right(self);
+                }
+                if(result != TREE_OP_SUCCESS)return result;
+            }
+        }
+    }
     return TREE_OP_SUCCESS;
 }
 
