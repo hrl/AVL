@@ -172,7 +172,75 @@ int avl_insert(Tree **self, void *data, int (*compar)(const void *, const void *
     return TREE_OP_SUCCESS;
 }
 
+int _avl_rotate(Tree **self){
+    if(avl_height_direct((*self)->left) - avl_height_direct((*self)->right) == 2){
+        if(avl_height_direct((*self)->left->left) > avl_height_direct((*self)->left->right)){
+            return _avl_single_rotate_with_left(self);
+        }
+        return _avl_double_rotate_with_left(self);
+    }
+    if(avl_height_direct((*self)->right) - avl_height_direct((*self)->left) == 2){
+        if(avl_height_direct((*self)->right->right) > avl_height_direct((*self)->right->left)){
+            return _avl_single_rotate_with_right(self);
+        }
+        return _avl_double_rotate_with_right(self);
+    }
+    return TREE_OP_SUCCESS;
+}
+
 int avl_delete(Tree **self, void *data, int (*compar)(const void *, const void *)){
+    if(*self == NULL){
+        return TREE_UNINIT_ERROR;
+    }
+
+    int result=TREE_OP_SUCCESS;
+
+    int compar_result=(*compar)(data, (*self)->data);
+    if(compar_result == 0){
+        if((*self)->right == NULL){
+            Tree *need_free;
+            need_free = *self;
+            *self = (*self)->left;
+            free(need_free);
+        } else {
+            Tree *left_iterator;
+            left_iterator = (*self)->right;
+            while(left_iterator->left != NULL){
+                left_iterator = left_iterator->left;
+            }
+            (*self)->data = left_iterator->data;
+
+            result = avl_delete(&((*self)->right), data, compar);
+            if(result != TREE_OP_SUCCESS)return result;
+            (*self)->height = _max(avl_height_direct((*self)->left), avl_height_direct((*self)->right)) + 1;
+        }
+    } else if(compar_result < 0){
+        if((*self)->left == NULL){
+            return TREE_OP_SUCCESS;
+        }
+        result = avl_delete(&((*self)->left), data, compar);
+        if(result != TREE_OP_SUCCESS)return result;
+    } else {
+        if((*self)->right == NULL){
+            return TREE_OP_SUCCESS;
+        }
+        result = avl_delete(&((*self)->right), data, compar);
+        if(result != TREE_OP_SUCCESS)return result;
+    }
+
+    (*self)->height = _max(avl_height_direct((*self)->left), avl_height_direct((*self)->right)) + 1;
+    if((*self)->left != NULL){
+        result = _avl_rotate(&((*self)->left));
+        if(result != TREE_OP_SUCCESS)return result;
+    }
+    if((*self)->right != NULL){
+        result = _avl_rotate(&((*self)->right));
+        if(result != TREE_OP_SUCCESS)return result;
+    }
+    if(*self != NULL){
+        result = _avl_rotate(self);
+        if(result != TREE_OP_SUCCESS)return result;
+    }
     return TREE_OP_SUCCESS;
 }
 
@@ -190,7 +258,6 @@ int avl_pre_order_traversal(Tree *self, int (*callback)(const void *)){
         result = avl_post_order_traversal(self->left, callback);
         if(result != TREE_OP_SUCCESS)return result;
     }
-
 
     if(self->right != NULL){
         result = avl_post_order_traversal(self->right, callback);
