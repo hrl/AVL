@@ -71,18 +71,18 @@ int avl_delete(Tree **self, void *data, int (*compar)(const void *, const void *
     return TREE_OP_SUCCESS;
 }
 
-int avl_pre_order_traversal(Tree **self, int (*callback)(const Tree *)){
+int avl_pre_order_traversal(Tree **self, int (*callback)(const void *)){
     return TREE_OP_SUCCESS;
 }
 
-int avl_in_order_traversal(Tree **self, int (*callback)(const Tree *)){
+int avl_in_order_traversal(Tree **self, int (*callback)(const void *)){
     return TREE_OP_SUCCESS;
 }
 
-int avl_post_order_traversal(Tree **self, int (*callback)(const Tree *)){
+int avl_post_order_traversal(Tree **self, int (*callback)(const void *)){
     return TREE_OP_SUCCESS;
 }
 
-int avl_level_order_traversal(Tree **self, int (*callback)(const Tree *)){
+int avl_level_order_traversal(Tree **self, int (*callback)(const void *)){
     return TREE_OP_SUCCESS;
 }
