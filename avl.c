@@ -167,6 +167,8 @@ int avl_insert(Tree **self, void *data, int (*compar)(const void *, const void *
             }
         }
     }
+    (*self)->height = _max(avl_height_direct((*self)->left), avl_height_direct((*self)->right)) + 1;
+
     return TREE_OP_SUCCESS;
 }
 
