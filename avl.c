@@ -50,20 +50,20 @@ int avl_height_direct(Tree *self){
     return self->height;
 }
 
-int avl_search(Tree *self, void *data, int *result, int (*compar)(const void *, const void *)){
+int avl_search(Tree *self, void *data, Tree **result, int (*compar)(const void *, const void *)){
     if(self == NULL){
         return TREE_UNINIT_ERROR;
     }
 
     int search_result=(*compar)(data, self->data);
     if(search_result == 0){
-        *result = 1;
+        *result = self;
     } else if (search_result > 0 && self->right != NULL) {
         return avl_search(self->right, data, result, compar);
     } else if (search_result < 0 && self->left != NULL) {
         return avl_search(self->left, data, result, compar);
     } else {
-        *result = 0;
+        *result = NULL;
     }
     return TREE_OP_SUCCESS;
 }
