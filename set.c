@@ -203,10 +203,6 @@ int set_union(Set *set_a, Set *set_b, Set **result_union, int (*compar)(const vo
     _Set_common_pipe *_pipe=NULL;
     _set_common_pipe_init(&_pipe, compar);
 
-    // small/large is not reliable/necessary
-    _pipe->set_small = set_a;
-    _pipe->set_large = set_b;
-
     result = set_map(set_a, _pipe, _set_union);
     if(result != SET_OP_SUCCESS)return result;
     result = set_map(set_b, _pipe, _set_union);
