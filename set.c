@@ -122,6 +122,15 @@ struct _set_common_pipe {
 
 typedef struct _set_common_pipe _Set_common_pipe;
 
+int _set_common_pipe_init(_Set_common_pipe **_pipe, int (*compar)(const void *, const void *)){
+    *_pipe = (_Set_common_pipe*)malloc(sizeof(_Set_common_pipe));
+    (*_pipe)->set_small = NULL;
+    (*_pipe)->set_large = NULL;
+    (*_pipe)->result = NULL;
+    (*_pipe)->compar = compar;
+    return SET_OP_SUCCESS;
+}
+
 int _set_intersection(const void *data, void *pipe){
     _Set_common_pipe *_pipe=NULL;
     _pipe = (_Set_common_pipe*)pipe;
@@ -152,11 +161,7 @@ int set_intersection(Set *set_a, Set *set_b, Set **result_intersection, int (*co
 
     int result;
     _Set_common_pipe *_pipe=NULL;
-    _pipe = (_Set_common_pipe*)malloc(sizeof(_Set_common_pipe));
-    _pipe->set_small = NULL;
-    _pipe->set_large = NULL;
-    _pipe->result = NULL;
-    _pipe->compar = compar;
+    _set_common_pipe_init(&_pipe, compar);
 
     _set_sort_by_size(&set_a, &set_b);
     _pipe->set_large = set_a;
