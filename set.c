@@ -166,15 +166,52 @@ int set_intersection(Set *set_a, Set *set_b, Set **result_intersection, int (*co
     _set_sort_by_size(&set_a, &set_b);
     _pipe->set_large = set_a;
 
-    result = avl_level_order_traversal(set_b->_tree, _pipe, _set_intersection);
-    if(result != TREE_OP_SUCCESS)return result;
+    result = set_map(set_b, _pipe, _set_intersection);
+    if(result != SET_OP_SUCCESS)return result;
 
     *result_intersection = _pipe->result;
 
     return SET_OP_SUCCESS;
 }
 
+int _set_union(const void *data, void *pipe){
+    _Set_common_pipe *_pipe=NULL;
+    _pipe = (_Set_common_pipe*)pipe;
+    int result;
+    if(_pipe->result == NULL){
+        result = set_init_with_data(&(_pipe->result), (void *)data);
+        if(result != SET_OP_SUCCESS && result != SET_INSERT_SAME_VALUE_ERROR)return result;
+    } else {
+        result = set_insert(&(_pipe->result), (void *)data, _pipe->compar);
+        if(result != SET_OP_SUCCESS && result != SET_INSERT_SAME_VALUE_ERROR)return result;
+    }
+
+    return SET_OP_SUCCESS;
+}
+
 int set_union(Set *set_a, Set *set_b, Set **result_union, int (*compar)(const void *, const void *)){
+    if(set_a == NULL || set_b == NULL){
+        return SET_UNINIT_ERROR;
+    }
+    if(*result_union != NULL){
+        return SET_INITED_ERROR;
+    }
+
+    int result;
+    _Set_common_pipe *_pipe=NULL;
+    _set_common_pipe_init(&_pipe, compar);
+
+    // small/large is not reliable/necessary
+    _pipe->set_small = set_a;
+    _pipe->set_large = set_b;
+
+    result = set_map(set_a, _pipe, _set_union);
+    if(result != SET_OP_SUCCESS)return result;
+    result = set_map(set_b, _pipe, _set_union);
+    if(result != SET_OP_SUCCESS)return result;
+
+    *result_union = _pipe->result;
+
     return SET_OP_SUCCESS;
 }
 
@@ -191,5 +228,8 @@ int set_is_equal(Set *set_a, Set *set_b, int result_is_equal, int (*compar)(cons
 }
 
 int set_map(Set *self, void *pipe, int (*callback)(const void *, void *)){
+    int result;
+    result = avl_level_order_traversal(self->_tree, pipe, callback);
+    if(result != TREE_OP_SUCCESS)return result;
     return SET_OP_SUCCESS;
 }
