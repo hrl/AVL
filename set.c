@@ -216,6 +216,15 @@ int set_union(Set *set_a, Set *set_b, Set **result_union, int (*compar)(const vo
 }
 
 int _set_difference(const void *data, void *pipe){
+    _Set_common_pipe *_pipe=NULL;
+    _pipe = (_Set_common_pipe*)pipe;
+    int result, search_result;
+    result = set_is_member(_pipe->set_large, (void *)data, &search_result, _pipe->compar);
+    if(result != SET_OP_SUCCESS)return result;
+    if(search_result == 0){
+        result = _set_init_or_insert(&(_pipe->result), 0, (void *)data, _pipe->compar);
+        if(result != SET_OP_SUCCESS)return SET_DIFFERENCE_ERROR;
+    }
     return SET_OP_SUCCESS;
 }
 
