@@ -117,6 +117,7 @@ struct _set_common_pipe {
     Set *set_large;
     Set *set_small;
     Set *result;
+    int result_int;
     int (*compar)(const void *, const void *);
 };
 
@@ -127,6 +128,7 @@ int _set_common_pipe_init(_Set_common_pipe **_pipe, int (*compar)(const void *, 
     (*_pipe)->set_small = NULL;
     (*_pipe)->set_large = NULL;
     (*_pipe)->result = NULL;
+    (*_pipe)->result_int = 0;
     (*_pipe)->compar = compar;
     return SET_OP_SUCCESS;
 }
