@@ -153,7 +153,7 @@ int _set_intersection(const void *data, void *pipe){
     int result, search_result;
     result = set_is_member(_pipe->set_large, (void *)data, &search_result, _pipe->compar);
     if(result != SET_OP_SUCCESS)return result;
-    if(search_result != 0){
+    if(search_result == 0){
         result = _set_init_or_insert(&(_pipe->result), 0, (void *)data, _pipe->compar);
         if(result != SET_OP_SUCCESS)return SET_INTERSECTION_ERROR;
     }
