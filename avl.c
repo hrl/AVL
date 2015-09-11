@@ -248,53 +248,30 @@ int avl_delete(Tree **self, void *data, int (*compar)(const void *, const void *
     return TREE_OP_SUCCESS;
 }
 
-int avl_pre_order_traversal(Tree *self, int (*callback)(const void *)){
+int avl_pre_order_traversal(Tree *self, void *pipe, int (*callback)(const void *, void *)){
     if(self == NULL){
         return TREE_UNINIT_ERROR;
     }
 
     int result=TREE_OP_SUCCESS;
 
-    result = (*callback)(self->data);
+    result = (*callback)(self->data, pipe);
     if(result != TREE_OP_SUCCESS)return result;
 
     if(self->left != NULL){
-        result = avl_pre_order_traversal(self->left, callback);
+        result = avl_pre_order_traversal(self->left, callback, pipe);
         if(result != TREE_OP_SUCCESS)return result;
     }
 
     if(self->right != NULL){
-        result = avl_pre_order_traversal(self->right, callback);
+        result = avl_pre_order_traversal(self->right, callback, pipe);
         if(result != TREE_OP_SUCCESS)return result;
     }
 
     return TREE_OP_SUCCESS;
 }
 
-int avl_in_order_traversal(Tree *self, int (*callback)(const void *)){
-    if(self == NULL){
-        return TREE_UNINIT_ERROR;
-    }
-
-    int result=TREE_OP_SUCCESS;
-
-    if(self->left != NULL){
-        result = avl_in_order_traversal(self->left, callback);
-        if(result != TREE_OP_SUCCESS)return result;
-    }
-
-    result = (*callback)(self->data);
-    if(result != TREE_OP_SUCCESS)return result;
-
-    if(self->right != NULL){
-        result = avl_in_order_traversal(self->right, callback);
-        if(result != TREE_OP_SUCCESS)return result;
-    }
-
-    return TREE_OP_SUCCESS;
-}
-
-int avl_post_order_traversal(Tree *self, int (*callback)(const void *)){
+int avl_in_order_traversal(Tree *self, void *pipe, int (*callback)(const void *, void *)){
     if(self == NULL){
         return TREE_UNINIT_ERROR;
     }
@@ -302,22 +279,45 @@ int avl_post_order_traversal(Tree *self, int (*callback)(const void *)){
     int result=TREE_OP_SUCCESS;
 
     if(self->left != NULL){
-        result = avl_post_order_traversal(self->left, callback);
+        result = avl_in_order_traversal(self->left, callback, pipe);
+        if(result != TREE_OP_SUCCESS)return result;
+    }
+
+    result = (*callback)(self->data, pipe);
+    if(result != TREE_OP_SUCCESS)return result;
+
+    if(self->right != NULL){
+        result = avl_in_order_traversal(self->right, callback, pipe);
+        if(result != TREE_OP_SUCCESS)return result;
+    }
+
+    return TREE_OP_SUCCESS;
+}
+
+int avl_post_order_traversal(Tree *self, void *pipe, int (*callback)(const void *, void *)){
+    if(self == NULL){
+        return TREE_UNINIT_ERROR;
+    }
+
+    int result=TREE_OP_SUCCESS;
+
+    if(self->left != NULL){
+        result = avl_post_order_traversal(self->left, callback, pipe);
         if(result != TREE_OP_SUCCESS)return result;
     }
 
     if(self->right != NULL){
-        result = avl_post_order_traversal(self->right, callback);
+        result = avl_post_order_traversal(self->right, callback, pipe);
         if(result != TREE_OP_SUCCESS)return result;
     }
 
-    result = (*callback)(self->data);
+    result = (*callback)(self->data, pipe);
     if(result != TREE_OP_SUCCESS)return result;
 
     return TREE_OP_SUCCESS;
 }
 
-int avl_level_order_traversal(Tree *self, int (*callback)(const void *)){
+int avl_level_order_traversal(Tree *self, void *pipe, int (*callback)(const void *, void *)){
     if(self == NULL){
         return TREE_UNINIT_ERROR;
     }
@@ -332,7 +332,7 @@ int avl_level_order_traversal(Tree *self, int (*callback)(const void *)){
     first++;
 
     while(first != last){
-        result = (*callback)(queue[last]->data);
+        result = (*callback)(queue[last]->data, pipe);
         if(result != TREE_OP_SUCCESS)return result;
 
         if(queue[last]->left != NULL){
