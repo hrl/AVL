@@ -232,7 +232,6 @@ int avl_delete(Tree **self, void *data, int (*compar)(const void *, const void *
         if(result != TREE_OP_SUCCESS)return result;
     }
 
-    (*self)->height = _max(avl_height_direct((*self)->left), avl_height_direct((*self)->right)) + 1;
     if((*self)->left != NULL){
         result = _avl_rotate(&((*self)->left));
         if(result != TREE_OP_SUCCESS)return result;
@@ -245,6 +244,7 @@ int avl_delete(Tree **self, void *data, int (*compar)(const void *, const void *
         result = _avl_rotate(self);
         if(result != TREE_OP_SUCCESS)return result;
     }
+    (*self)->height = _max(avl_height_direct((*self)->left), avl_height_direct((*self)->right)) + 1;
     return TREE_OP_SUCCESS;
 }
 
