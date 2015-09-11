@@ -30,6 +30,18 @@ int set_init(Set **self){
 }
 
 int set_del(Set **self){
+    if(*self == NULL){
+        return SET_OP_SUCCESS;
+    }
+
+    int result;
+    result = avl_del(&((*self)->_tree));
+    if(result != TREE_OP_SUCCESS)return SET_DEL_FAIL_ERROR;
+    free(*self);
+    if(*self == NULL){
+        return SET_DEL_FAIL_ERROR;
+    }
+
     return SET_OP_SUCCESS;
 }
 
