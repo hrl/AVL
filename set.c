@@ -66,7 +66,7 @@ int set_is_member(Set *self, void *data, int *result_is_member, int (*compar)(co
     }
 
     Tree *result_search=NULL;
-    avl_search(&(self->_tree), data, &result_search, compar);
+    avl_search(self->_tree, data, &result_search, compar);
     if(result_search == NULL){
         *result_is_member = 1;
     } else {
@@ -96,7 +96,7 @@ int set_delete(Set **self, void *data, int (*compar)(const void *, const void *)
     }
 
     int result;
-    result = set_delete(&((*self)->_tree), data, compar);
+    result = avl_delete(&((*self)->_tree), data, compar);
     if(result != TREE_OP_SUCCESS)return SET_DELETE_FAIL_ERROR;
     (*self)->size--;
 
@@ -250,7 +250,6 @@ int set_difference(Set *set_a, Set *set_b, Set **result_difference, int (*compar
 
     return SET_OP_SUCCESS;
 }
-
 
 int _set_is_subset(const void *data, void *pipe) {
     _Set_common_pipe *_pipe = NULL;
