@@ -30,6 +30,13 @@ int avl_init(Tree **self){
     return TREE_OP_SUCCESS;
 }
 
+int avl_init_with_data(Tree **self, void *data) {
+    int result;
+    result = avl_init(self);
+    if(result != TREE_OP_SUCCESS)return result;
+    (*self)->data = data;
+}
+
 int avl_del(Tree **self){
     if((*self) == NULL){
         return TREE_OP_SUCCESS;
@@ -108,19 +115,6 @@ int _avl_double_rotate_with_right(Tree **self){
     return _avl_single_rotate_with_right(self);
 }
 
-int _avl_direct_init(Tree **self, void *data) {
-    int result=TREE_OP_SUCCESS;
-    result = avl_init(self);
-
-    if(result == TREE_INIT_FAIL_ERROR){
-        result = TREE_INSERT_FAIL_ERROR;
-    }
-
-    (*self)->data = data;
-
-    return result;
-}
-
 int avl_insert(Tree **self, void *data, int (*compar)(const void *, const void *)){
     if(*self == NULL){
         return TREE_UNINIT_ERROR;
@@ -134,8 +128,8 @@ int avl_insert(Tree **self, void *data, int (*compar)(const void *, const void *
     }
     if(compar_result < 0){
         if((*self)->left == NULL){
-            result = _avl_direct_init(&((*self)->left), data);
-            if(result != TREE_OP_SUCCESS)return result;
+            result = avl_init_with_data(&((*self)->left), data);
+            if(result != TREE_OP_SUCCESS)return TREE_INSERT_FAIL_ERROR;
         } else {
             result = avl_insert(&((*self)->left), data, compar);
             if(result != TREE_OP_SUCCESS)return result;
@@ -150,7 +144,7 @@ int avl_insert(Tree **self, void *data, int (*compar)(const void *, const void *
         }
     } else {
         if((*self)->right == NULL){
-            result = _avl_direct_init(&((*self)->right), data);
+            result = avl_init_with_data(&((*self)->right), data);
             if(result != TREE_OP_SUCCESS)return result;
         } else {
             result = avl_insert(&((*self)->right), data, compar);

@@ -29,6 +29,25 @@ int set_init(Set **self){
     return SET_OP_SUCCESS;
 }
 
+int set_init_with_data(Set **self, void *data) {
+    if(*self != NULL){
+        return SET_INITED_ERROR;
+    }
+
+    *self = (Set*)malloc(sizeof(Set));
+    if(*self == NULL){
+        return SET_INIT_FAIL_ERROR;
+    }
+
+    (*self)->size = 1;
+    (*self)->_tree = NULL;
+    int result;
+    result = avl_init_with_data(&((*self)->_tree), data);
+    if(result != TREE_OP_SUCCESS)return SET_INIT_FAIL_ERROR;
+
+    return SET_OP_SUCCESS;
+}
+
 int set_del(Set **self){
     if(*self == NULL){
         return SET_OP_SUCCESS;
@@ -84,7 +103,65 @@ int set_delete(Set **self, void *data, int (*compar)(const void *, const void *)
     return SET_OP_SUCCESS;
 }
 
+int _set_sort_by_size(Set **set_a, Set **set_b){
+    if((*set_a)->size < (*set_b)->size){
+        Set *tmp;
+        tmp = *set_a;
+        *set_a = *set_b;
+        *set_b = tmp;
+    }
+    return SET_OP_SUCCESS;
+}
+
+struct _set_intersection_pipe {
+    Set *set_large;
+    Set *result;
+    int (*compar)(const void *, const void *);
+};
+
+int _set_intersection(const void *data, void *pipe){
+    struct _set_intersection_pipe *_pipe=NULL;
+    _pipe = (struct _set_intersection_pipe*)pipe;
+    int i, result, search_result;
+    for(i=0; i<_pipe->set_large->size; i++){
+        result = set_is_member(_pipe->set_large, (void *)data, &search_result, _pipe->compar);
+        if(result != SET_OP_SUCCESS)return result;
+        if(search_result != 0){
+            if(_pipe->result == NULL){
+                result = set_init_with_data(&(_pipe->result), (void *)data);
+                if(result != SET_OP_SUCCESS)return result;
+            } else {
+                result = set_insert(&(_pipe->result), (void *)data, _pipe->compar);
+                if(result != TREE_OP_SUCCESS)return SET_INTERSECTION_ERROR;
+            }
+        }
+    }
+    return SET_OP_SUCCESS;
+}
+
 int set_intersection(Set *set_a, Set *set_b, Set **result_intersection, int (*compar)(const void *, const void *)){
+    if(set_a == NULL || set_b == NULL){
+        return SET_UNINIT_ERROR;
+    }
+    if(*result_intersection != NULL){
+        return SET_INITED_ERROR;
+    }
+
+    int result;
+    struct _set_intersection_pipe *_pipe=NULL;
+    _pipe = (struct _set_intersection_pipe*)malloc(sizeof(struct _set_intersection_pipe));
+    _pipe->set_large = NULL;
+    _pipe->result = NULL;
+    _pipe->compar = compar;
+
+    _set_sort_by_size(&set_a, &set_b);
+    _pipe->set_large = set_a;
+
+    result = avl_level_order_traversal(set_b->_tree, _pipe, _set_intersection);
+    if(result != TREE_OP_SUCCESS)return result;
+
+    *result_intersection = _pipe->result;
+
     return SET_OP_SUCCESS;
 }
 
