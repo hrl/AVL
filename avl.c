@@ -134,8 +134,7 @@ int avl_insert(Tree **self, void *data, int (*compar)(const void *, const void *
     }
     if(compar_result < 0){
         if((*self)->left == NULL){
-            Tree *new_tree=NULL;
-            result = _avl_direct_init(&new_tree, data);
+            result = _avl_direct_init(&((*self)->left), data);
             if(result != TREE_OP_SUCCESS)return result;
         } else {
             result = avl_insert(&((*self)->left), data, compar);
@@ -151,8 +150,7 @@ int avl_insert(Tree **self, void *data, int (*compar)(const void *, const void *
         }
     } else {
         if((*self)->right == NULL){
-            Tree *new_tree=NULL;
-            result = _avl_direct_init(&new_tree, data);
+            result = _avl_direct_init(&((*self)->right), data);
             if(result != TREE_OP_SUCCESS)return result;
         } else {
             result = avl_insert(&((*self)->right), data, compar);
