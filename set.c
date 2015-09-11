@@ -42,6 +42,16 @@ int set_del(Set **self){
 }
 
 int set_insert(Set **self, void *data, int (*compar)(const void *, const void *)){
+    if(*self == NULL){
+        return SET_UNINIT_ERROR;
+    }
+
+    int result;
+    result = avl_insert(&((*self)->_tree), data, compar);
+    if(result == TREE_INSERT_SAME_VALUE_ERROR)return SET_INSERT_SAME_VALUE_ERROR;
+    if(result != TREE_OP_SUCCESS)return SET_INSERT_FAIL_ERROR;
+    (*self)->size++;
+
     return SET_OP_SUCCESS;
 }
 
