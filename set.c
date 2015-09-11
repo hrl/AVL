@@ -213,7 +213,30 @@ int set_union(Set *set_a, Set *set_b, Set **result_union, int (*compar)(const vo
     return SET_OP_SUCCESS;
 }
 
+int _set_difference(const void *data, void *pipe){
+    return SET_OP_SUCCESS;
+}
+
 int set_difference(Set *set_a, Set *set_b, Set **result_difference, int (*compar)(const void *, const void *)){
+    if(set_a == NULL || set_b == NULL){
+        return SET_UNINIT_ERROR;
+    }
+    if(*result_difference != NULL){
+        return SET_INITED_ERROR;
+    }
+
+    int result;
+    _Set_common_pipe *_pipe=NULL;
+    _set_common_pipe_init(&_pipe, compar);
+
+    // large is nonsensical here
+    _pipe->set_large = set_b;
+
+    result = set_map(set_a, _pipe, _set_difference);
+    if(result != SET_OP_SUCCESS)return result;
+
+    *result_difference = _pipe->result;
+
     return SET_OP_SUCCESS;
 }
 
