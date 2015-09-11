@@ -41,6 +41,22 @@ int set_del(Set **self){
     return SET_OP_SUCCESS;
 }
 
+int set_is_member(Set *self, void *data, int *result_is_member, int (*compar)(const void *, const void *)){
+    if(self == NULL){
+        return SET_UNINIT_ERROR;
+    }
+
+    Tree *result_search=NULL;
+    avl_search(&(self->_tree), data, &result_search, compar);
+    if(result_search == NULL){
+        *result_is_member = 1;
+    } else {
+        *result_is_member = 0;
+    }
+
+    return SET_OP_SUCCESS;
+}
+
 int set_insert(Set **self, void *data, int (*compar)(const void *, const void *)){
     if(*self == NULL){
         return SET_UNINIT_ERROR;
@@ -56,10 +72,6 @@ int set_insert(Set **self, void *data, int (*compar)(const void *, const void *)
 }
 
 int set_remove(Set **self, void *data, int (*compar)(const void *, const void *)){
-    return SET_OP_SUCCESS;
-}
-
-int set_is_member(Set *self, void *data, int *result_is_member, int (*compar)(const void *, const void *)){
     return SET_OP_SUCCESS;
 }
 
