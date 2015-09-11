@@ -68,9 +68,9 @@ int set_is_member(Set *self, void *data, int *result_is_member, int (*compar)(co
     Tree *result_search=NULL;
     avl_search(self->_tree, data, &result_search, compar);
     if(result_search == NULL){
-        *result_is_member = 1;
-    } else {
         *result_is_member = 0;
+    } else {
+        *result_is_member = 1;
     }
 
     return SET_OP_SUCCESS;
@@ -257,7 +257,7 @@ int _set_is_subset(const void *data, void *pipe) {
     int result, search_result;
     result = set_is_member(_pipe->set_large, (void *)data, &search_result, _pipe->compar);
     if(result != SET_OP_SUCCESS)return result;
-    if(search_result != 0){
+    if(search_result == 0){
         _pipe->result_int = 0;
     }
     return SET_OP_SUCCESS;
