@@ -11,7 +11,7 @@ int set_init(Set **self);
 int set_del(Set **self);
 int set_is_member(Set *self, void *data, int *result_is_member, int (*compar)(const void *, const void *));
 int set_insert(Set **self, void *data, int (*compar)(const void *, const void *));
-int set_remove(Set **self, void *data, int (*compar)(const void *, const void *));
+int set_delete(Set **self, void *data, int (*compar)(const void *, const void *));
 int set_intersection(Set *set_a, Set *set_b, Set **result_intersection, int (*compar)(const void *, const void *));
 int set_union(Set *set_a, Set *set_b, Set **result_union, int (*compar)(const void *, const void *));
 int set_difference(Set *set_a, Set *set_b, Set **result_difference, int (*compar)(const void *, const void *));

@@ -71,7 +71,16 @@ int set_insert(Set **self, void *data, int (*compar)(const void *, const void *)
     return SET_OP_SUCCESS;
 }
 
-int set_remove(Set **self, void *data, int (*compar)(const void *, const void *)){
+int set_delete(Set **self, void *data, int (*compar)(const void *, const void *)){
+    if(*self == NULL){
+        return SET_UNINIT_ERROR;
+    }
+
+    int result;
+    result = set_delete(&((*self)->_tree), data, compar);
+    if(result != TREE_OP_SUCCESS)return SET_DELETE_FAIL_ERROR;
+    (*self)->size--;
+
     return SET_OP_SUCCESS;
 }
 
