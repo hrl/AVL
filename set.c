@@ -29,7 +29,7 @@ int set_init(Set **self){
     return SET_OP_SUCCESS;
 }
 
-int set_destory(Set **self){
+int set_del(Set **self){
     return SET_OP_SUCCESS;
 }
 
