@@ -200,15 +200,21 @@ int avl_delete(Tree **self, void *data, int (*compar)(const void *, const void *
             need_free = *self;
             *self = (*self)->left;
             free(need_free);
+            if(*self == NULL){
+                return TREE_OP_SUCCESS;
+            }
         } else {
+            // find the minimum child in right tree
             Tree *left_iterator;
             left_iterator = (*self)->right;
             while(left_iterator->left != NULL){
                 left_iterator = left_iterator->left;
             }
+            // set current node's data to the minimum data in right tree
             (*self)->data = left_iterator->data;
 
-            result = avl_delete(&((*self)->right), data, compar);
+            // then delete the minimum child in right tree
+            result = avl_delete(&((*self)->right), (*self)->data, compar);
             if(result != TREE_OP_SUCCESS)return result;
             (*self)->height = _max(avl_height_direct((*self)->left), avl_height_direct((*self)->right)) + 1;
         }
