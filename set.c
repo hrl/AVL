@@ -290,7 +290,16 @@ int set_is_subset(Set *set_a, Set *set_b, int *result_is_subset, int (*compar)(c
 }
 
 int set_is_equal(Set *set_a, Set *set_b, int *result_is_equal, int (*compar)(const void *, const void *)){
-    return SET_OP_SUCCESS;
+    if(set_a == NULL || set_b == NULL){
+        return SET_UNINIT_ERROR;
+    }
+
+    if(set_a->size != set_b->size){
+        *result_is_equal = 0;
+        return SET_OP_SUCCESS;
+    }
+
+    return set_is_subset(set_a, set_b, result_is_equal, compar);
 }
 
 int set_map(Set *self, void *pipe, int (*callback)(const void *, void *)){
