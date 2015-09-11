@@ -113,15 +113,18 @@ int _set_sort_by_size(Set **set_a, Set **set_b){
     return SET_OP_SUCCESS;
 }
 
-struct _set_intersection_pipe {
+struct _set_common_pipe {
     Set *set_large;
+    Set *set_small;
     Set *result;
     int (*compar)(const void *, const void *);
 };
 
+typedef struct _set_common_pipe _Set_common_pipe;
+
 int _set_intersection(const void *data, void *pipe){
-    struct _set_intersection_pipe *_pipe=NULL;
-    _pipe = (struct _set_intersection_pipe*)pipe;
+    _Set_common_pipe *_pipe=NULL;
+    _pipe = (_Set_common_pipe*)pipe;
     int i, result, search_result;
     for(i=0; i<_pipe->set_large->size; i++){
         result = set_is_member(_pipe->set_large, (void *)data, &search_result, _pipe->compar);
@@ -148,8 +151,9 @@ int set_intersection(Set *set_a, Set *set_b, Set **result_intersection, int (*co
     }
 
     int result;
-    struct _set_intersection_pipe *_pipe=NULL;
-    _pipe = (struct _set_intersection_pipe*)malloc(sizeof(struct _set_intersection_pipe));
+    _Set_common_pipe *_pipe=NULL;
+    _pipe = (_Set_common_pipe*)malloc(sizeof(_Set_common_pipe));
+    _pipe->set_small = NULL;
     _pipe->set_large = NULL;
     _pipe->result = NULL;
     _pipe->compar = compar;
