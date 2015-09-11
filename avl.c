@@ -330,7 +330,6 @@ int avl_level_order_traversal(Tree *self, int (*callback)(const void *)){
     while(first != last){
         result = (*callback)(queue[last]->data);
         if(result != TREE_OP_SUCCESS)return result;
-        last++;
 
         if(queue[last]->left != NULL){
             queue[first] = queue[last]->left;
@@ -340,6 +339,7 @@ int avl_level_order_traversal(Tree *self, int (*callback)(const void *)){
             queue[first] = queue[last]->right;
             first++;
         }
+        last++;
     }
 
     return TREE_OP_SUCCESS;
