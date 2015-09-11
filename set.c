@@ -34,13 +34,9 @@ int set_del(Set **self){
         return SET_OP_SUCCESS;
     }
 
-    int result;
-    result = avl_del(&((*self)->_tree));
-    if(result != TREE_OP_SUCCESS)return SET_DEL_FAIL_ERROR;
+    avl_del(&((*self)->_tree));
     free(*self);
-    if(*self == NULL){
-        return SET_DEL_FAIL_ERROR;
-    }
+    *self = NULL;
 
     return SET_OP_SUCCESS;
 }
