@@ -6,7 +6,9 @@
 #define AVL_SET_DEFINES_H
 
 enum {
-    SET_OP_SUCCESS
+    SET_OP_SUCCESS,
+    SET_INITED_ERROR,
+    SET_INIT_FAIL_ERROR
 };
 
 #endif //AVL_SET_DEFINES_H
