@@ -150,14 +150,12 @@ int _set_common_pipe_init(_Set_common_pipe **_pipe, int (*compar)(const void *, 
 int _set_intersection(const void *data, void *pipe){
     _Set_common_pipe *_pipe=NULL;
     _pipe = (_Set_common_pipe*)pipe;
-    int i, result, search_result;
-    for(i=0; i<_pipe->set_large->size; i++){
-        result = set_is_member(_pipe->set_large, (void *)data, &search_result, _pipe->compar);
-        if(result != SET_OP_SUCCESS)return result;
-        if(search_result != 0){
-            result = _set_init_or_insert(&(_pipe->result), 0, (void *)data, _pipe->compar);
-            if(result != SET_OP_SUCCESS)return SET_INTERSECTION_ERROR;
-        }
+    int result, search_result;
+    result = set_is_member(_pipe->set_large, (void *)data, &search_result, _pipe->compar);
+    if(result != SET_OP_SUCCESS)return result;
+    if(search_result != 0){
+        result = _set_init_or_insert(&(_pipe->result), 0, (void *)data, _pipe->compar);
+        if(result != SET_OP_SUCCESS)return SET_INTERSECTION_ERROR;
     }
     return SET_OP_SUCCESS;
 }
