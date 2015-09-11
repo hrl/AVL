@@ -251,11 +251,45 @@ int set_difference(Set *set_a, Set *set_b, Set **result_difference, int (*compar
     return SET_OP_SUCCESS;
 }
 
-int set_is_subset(Set *set_a, Set *set_b, int result_is_subset, int (*compar)(const void *, const void *)){
+
+int _set_is_subset(const void *data, void *pipe) {
+    _Set_common_pipe *_pipe = NULL;
+    _pipe = (_Set_common_pipe *) pipe;
+    int result, search_result;
+    result = set_is_member(_pipe->set_large, (void *)data, &search_result, _pipe->compar);
+    if(result != SET_OP_SUCCESS)return result;
+    if(search_result != 0){
+        _pipe->result_int = 0;
+    }
     return SET_OP_SUCCESS;
 }
 
-int set_is_equal(Set *set_a, Set *set_b, int result_is_equal, int (*compar)(const void *, const void *)){
+int set_is_subset(Set *set_a, Set *set_b, int *result_is_subset, int (*compar)(const void *, const void *)){
+    if(set_a == NULL || set_b == NULL){
+        return SET_UNINIT_ERROR;
+    }
+
+    if(set_a->size > set_b->size){
+        *result_is_subset = 0;
+        return SET_OP_SUCCESS;
+    }
+
+    int result;
+    _Set_common_pipe *_pipe=NULL;
+    _set_common_pipe_init(&_pipe, compar);
+
+    _pipe->set_large = set_b;
+    _pipe->result_int = 1;
+
+    result = set_map(set_a, _pipe, _set_is_subset);
+    if(result != SET_OP_SUCCESS)return result;
+
+    *result_is_subset = _pipe->result_int;
+
+    return SET_OP_SUCCESS;
+}
+
+int set_is_equal(Set *set_a, Set *set_b, int *result_is_equal, int (*compar)(const void *, const void *)){
     return SET_OP_SUCCESS;
 }
 
