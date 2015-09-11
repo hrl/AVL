@@ -35,6 +35,7 @@ int avl_init_with_data(Tree **self, void *data) {
     result = avl_init(self);
     if(result != TREE_OP_SUCCESS)return result;
     (*self)->data = data;
+    return TREE_OP_SUCCESS;
 }
 
 int avl_del(Tree **self){
