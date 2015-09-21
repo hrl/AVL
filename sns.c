@@ -302,10 +302,30 @@ int people_is_friend(People *self, People *target, int *is_friend){
 }
 
 int people_common_followings(People *self, People *target, Set **common_followings){
+    if(self == NULL || target == NULL){
+        return PEOPLE_UNINIT_ERROR;
+    }
+    if(*common_followings != NULL){
+        return SET_INITED_ERROR;
+    }
+
+    int result;
+    result = set_intersection(self->_followings, target->_followings, common_followings, people_compar);
+    if(result != SET_OP_SUCCESS) return PEOPLE_CIRCLE_FAIL_ERROR;
     return PEOPLE_OP_SUCCESS;
 }
 
 int people_common_followers(People *self, People *target, Set **common_followers){
+    if(self == NULL || target == NULL){
+        return PEOPLE_UNINIT_ERROR;
+    }
+    if(*common_followers != NULL){
+        return SET_INITED_ERROR;
+    }
+
+    int result;
+    result = set_intersection(self->_followers, target->_followers, common_followers, people_compar);
+    if(result != SET_OP_SUCCESS) return PEOPLE_CIRCLE_FAIL_ERROR;
     return PEOPLE_OP_SUCCESS;
 }
 
