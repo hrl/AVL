@@ -32,6 +32,10 @@ int sns_init(Sns **self){
     (*self)->id_max = 0;
     (*self)->_peoples = NULL;
 
+    int result;
+    result = set_init(&((*self)->_peoples));
+    if(result != SET_OP_SUCCESS) return SNS_INIT_FAIL_ERROR;
+
     return SNS_OP_SUCCESS;
 }
 
@@ -59,11 +63,7 @@ int sns_insert(Sns *self, People *people){
     people->id = self->id_max + 1;
 
     int result;
-    if(self->_peoples == NULL){
-        result = set_init_with_data(&(self->_peoples), people);
-    } else {
-        result = set_insert(&(self->_peoples), people, people_compar);
-    }
+    result = set_insert(&(self->_peoples), people, people_compar);
     if(result != SET_OP_SUCCESS) return SNS_INSERT_FAIL_ERROR;
     self->id_max++;
 
@@ -102,12 +102,21 @@ int people_init(Sns *universal, People **self, char name[100]){
 
     (*self)->id = 0;
     strcpy((*self)->name, name);
-    (*self)->_followings = NULL;
-    (*self)->_followers = NULL;
-    (*self)->_friends = NULL;
-    (*self)->__incoming_friends = NULL;
 
+    Set **wait_init=&((*self)->_followings);
+    int i;
     int result;
+    for(i=0; i<4; i++){
+        // 0: _followings
+        // 1: _followers
+        // 2: _friends
+        // 3: __incoming_friends
+        *wait_init = NULL;
+        result = set_init(wait_init);
+        if(result != SET_OP_SUCCESS) return PEOPLE_INIT_FAIL_ERROR;
+        wait_init++;
+    }
+
     result = sns_insert(universal, *self);
     if(result != SNS_OP_SUCCESS) return PEOPLE_INIT_FAIL_ERROR;
 
@@ -127,6 +136,7 @@ int _people_common_pipe_init(_People_common_pipe **_pipe, int (*compar)(const vo
     (*_pipe)->self = NULL;
     (*_pipe)->refresh_shift = 0;
     (*_pipe)->result_set = NULL;
+    set_init(&((*_pipe)->result_set));
     (*_pipe)->compar = compar;
     return PEOPLE_OP_SUCCESS;
 }
@@ -135,6 +145,7 @@ int _people_common_pipe_del(_People_common_pipe **_pipe){
     if(*_pipe == NULL){
         return PEOPLE_OP_SUCCESS;
     }
+    set_del(&((*_pipe)->result_set));
     free(*_pipe);
     *_pipe = NULL;
     return PEOPLE_OP_SUCCESS;
@@ -361,8 +372,15 @@ int people_extend_friends(Set *universal, People *self, Set **extend_friends){
     _pipe->self = self;
 
     int result;
+    // make a copy of self->_friends
+    result = set_extend(_pipe->result_set, self->_friends, people_compar);
+    if(result != SET_OP_SUCCESS) return PEOPLE_CIRCLE_FAIL_ERROR;
+
+    // map self->_friends to extend result
     result = set_map(self->_friends, _pipe, _people_extend_friends);
     if(result != SET_OP_SUCCESS) return PEOPLE_CIRCLE_FAIL_ERROR;
+
+    // delete self from result
     result = set_delete(&(_pipe->result_set), self, people_compar);
     if(result != SET_OP_SUCCESS) return PEOPLE_CIRCLE_FAIL_ERROR;
 

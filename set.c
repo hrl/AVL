@@ -30,18 +30,6 @@ int set_init(Set **self){
     return SET_OP_SUCCESS;
 }
 
-int set_init_with_data(Set **self, void *data) {
-    int result;
-    result = set_init(self);
-    if(result != SET_OP_SUCCESS)return result;
-
-    (*self)->size = 1;
-    result = avl_init(&((*self)->_tree), data);
-    if(result != TREE_OP_SUCCESS)return SET_INIT_FAIL_ERROR;
-
-    return SET_OP_SUCCESS;
-}
-
 int set_del(Set **self){
     if(*self == NULL){
         return SET_OP_SUCCESS;
@@ -110,13 +98,12 @@ int _set_sort_by_size(Set **set_a, Set **set_b){
 int _set_init_or_insert(Set **self, int pass_same, void *data, int (*compar)(const void *, const void *)){
     int result;
     if(*self == NULL){
-        result = set_init_with_data(self, data);
-        if(result != SET_OP_SUCCESS)return result;
-    } else {
-        result = set_insert(self, data, compar);
-        if(pass_same && result == SET_INSERT_SAME_VALUE_ERROR)result = SET_OP_SUCCESS;
+        result = set_init(self);
         if(result != SET_OP_SUCCESS)return result;
     }
+    result = set_insert(self, data, compar);
+    if(pass_same && result == SET_INSERT_SAME_VALUE_ERROR)result = SET_OP_SUCCESS;
+    if(result != SET_OP_SUCCESS)return result;
 
     return SET_OP_SUCCESS;
 }

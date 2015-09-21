@@ -8,7 +8,6 @@
 #include "set_structs.h"
 
 int set_init(Set **self);
-int set_init_with_data(Set **self, void *data);
 int set_del(Set **self);
 int set_is_member(Set *self, void *data, int *result_is_member, int (*compar)(const void *, const void *));
 int set_insert(Set **self, void *data, int (*compar)(const void *, const void *));
