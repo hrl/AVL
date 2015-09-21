@@ -46,7 +46,26 @@ int sns_del(Sns **self){
     return SNS_OP_SUCCESS;
 }
 
-int sns_add(Sns **self, People *people){
+int sns_insert(Sns **self, People *people){
+    if(*self == NULL){
+        return SNS_UNINIT_ERROR;
+    }
+
+    if(people == NULL){
+        return PEOPLE_UNINIT_ERROR;
+    }
+
+    people->id = (*self)->id_max + 1;
+
+    int result;
+    if((*self)->_peoples == NULL){
+        result = set_init_with_data(&((*self)->_peoples), people);
+    } else {
+        result = set_insert(&((*self)->_peoples), people, people_compar);
+    }
+    if(result != SET_OP_SUCCESS) return SNS_INSERT_FAIL_ERROR;
+    (*self)->id_max++;
+
     return SNS_OP_SUCCESS;
 }
 
