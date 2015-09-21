@@ -56,7 +56,7 @@ int sns_insert(Sns *self, People *people){
         return PEOPLE_UNINIT_ERROR;
     }
 
-    people->id = (*self)->id_max + 1;
+    people->id = self->id_max + 1;
 
     int result;
     if(self->_peoples == NULL){
