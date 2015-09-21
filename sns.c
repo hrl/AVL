@@ -129,6 +129,15 @@ int _people_common_pipe_init(_People_common_pipe **_pipe, int (*compar)(const vo
     return PEOPLE_OP_SUCCESS;
 }
 
+int _people_common_pipe_del(_People_common_pipe **_pipe){
+    if(*_pipe == NULL){
+        return PEOPLE_OP_SUCCESS;
+    }
+    free(*_pipe);
+    *_pipe = NULL;
+    return PEOPLE_OP_SUCCESS;
+}
+
 int _people_del_refresh_set(const void *data, void *_pipe){
     _People_common_pipe *pipe;
     pipe = (_People_common_pipe*)_pipe;
@@ -180,6 +189,8 @@ int people_del(Sns *universal, People **self){
     set_del(&((*self)->__incoming_friends));
     free(*self);
     *self = NULL;
+
+    _people_common_pipe_del(&_pipe);
 
     return PEOPLE_OP_SUCCESS;
 }
