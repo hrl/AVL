@@ -19,6 +19,20 @@ int people_compar(const void *a, const void *b){
 }
 
 int people_init(Set *universal, People **self){
+    if(universal == NULL){
+        return SNS_UNINIT_ERROR;
+    }
+
+    if(*self != NULL){
+        return PEOPLE_INITED_ERROR;
+    }
+
+    *self = (People*)malloc(sizeof(People));
+    if(*self == NULL) {
+        return PEOPLE_INIT_FAIL_ERROR;
+    }
+    // init
+
     return SNS_OP_SUCCESS;
 }
 
