@@ -5,7 +5,7 @@
 #ifndef AVL_SNS_FUNCTIONS_H
 #define AVL_SNS_FUNCTIONS_H
 
-#import "sns_structs.h"
+#include "sns_structs.h"
 
 int people_compar(const void *a, const void *b);
 int people_init(Set *universal, People **self);
