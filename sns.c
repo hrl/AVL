@@ -224,14 +224,35 @@ int people_friend(People *self, People *target){
 }
 
 int people_followings(People *self, Set **followings){
+    if(self == NULL){
+        return PEOPLE_UNINIT_ERROR;
+    }
+
+    // tmp handle
+    *followings = self->_followings;
+
     return PEOPLE_OP_SUCCESS;
 }
 
 int people_followers(People *self, Set **followers){
+    if(self == NULL){
+        return PEOPLE_UNINIT_ERROR;
+    }
+
+    // tmp handle
+    *followers = self->_followers;
+
     return PEOPLE_OP_SUCCESS;
 }
 
 int people_friends(People *self, Set **friends){
+    if(self == NULL){
+        return PEOPLE_UNINIT_ERROR;
+    }
+
+    // tmp handle
+    *friends = self->_friends;
+
     return PEOPLE_OP_SUCCESS;
 }
 
