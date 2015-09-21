@@ -5,4 +5,8 @@
 #ifndef AVL_SNS_DEFINES_H
 #define AVL_SNS_DEFINES_H
 
+enum {
+    SNS_OP_SUCCESS
+};
+
 #endif //AVL_SNS_DEFINES_H
