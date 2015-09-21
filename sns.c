@@ -51,6 +51,18 @@ int sns_del(Sns **self){
     return SNS_OP_SUCCESS;
 }
 
+int sns_search(Sns *self, People *people, People **result_people, int *result_found){
+    if(self == NULL){
+        return SNS_UNINIT_ERROR;
+    }
+
+    int result;
+    result = set_search(self->_peoples, people, result_people, result_found, people_compar);
+    if(result != SET_OP_SUCCESS) return SNS_SEARCH_ERROR;
+
+    return SNS_OP_SUCCESS;
+}
+
 int sns_insert(Sns *self, People *people){
     if(self == NULL){
         return SNS_UNINIT_ERROR;
