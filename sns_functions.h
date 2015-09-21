@@ -8,10 +8,13 @@
 #include "sns_structs.h"
 
 int people_compar(const void *a, const void *b);
-int people_init(Set *universal, People **self);
-int people_del(Set *universal, People **self);
-int people_follow(Set *universal, People *self, People *target);
-int people_friend(Set *universal, People *self, People *target);
+int sns_init(Sns **self);
+int sns_del(Sns **self);
+int sns_add(Sns **self, People *people);
+int people_init(Sns *universal, People **self);
+int people_del(Sns *universal, People **self);
+int people_follow(Sns *universal, People *self, People *target);
+int people_friend(Sns *universal, People *self, People *target);
 int people_followings(People *self, Set **followings);
 int people_followers(People *self, Set **followers);
 int people_friends(People *self, Set **friends);

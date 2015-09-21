@@ -7,6 +7,11 @@
 
 #include "set_structs.h"
 
+struct sns {
+    int id_max;
+    Set *peoples;
+};
+
 struct people {
     int id;
     char name[100];
@@ -14,6 +19,8 @@ struct people {
     Set *followings;
     Set *followers;
 };
+
+typedef struct sns Sns;
 typedef struct people People;
 
 #endif //AVL_SNS_STRUCTS_H

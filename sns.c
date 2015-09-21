@@ -18,7 +18,19 @@ int people_compar(const void *a, const void *b){
     return A->id - B->id;
 }
 
-int people_init(Set *universal, People **self){
+int sns_init(Sns **self){
+    return SNS_OP_SUCCESS;
+}
+
+int sns_del(Sns **self){
+    return SNS_OP_SUCCESS;
+}
+
+int sns_add(Sns **self, People *people){
+    return SNS_OP_SUCCESS;
+}
+
+int people_init(Sns *universal, People **self){
     if(universal == NULL){
         return SNS_UNINIT_ERROR;
     }
@@ -33,53 +45,53 @@ int people_init(Set *universal, People **self){
     }
     // init
 
-    return SNS_OP_SUCCESS;
+    return PEOPLE_OP_SUCCESS;
 }
 
-int people_del(Set *universal, People **self){
-    return SNS_OP_SUCCESS;
+int people_del(Sns *universal, People **self){
+    return PEOPLE_OP_SUCCESS;
 }
 
-int people_follow(Set *universal, People *self, People *target){
-    return SNS_OP_SUCCESS;
+int people_follow(Sns *universal, People *self, People *target){
+    return PEOPLE_OP_SUCCESS;
 }
 
-int people_friend(Set *universal, People *self, People *target){
-    return SNS_OP_SUCCESS;
+int people_friend(Sns *universal, People *self, People *target){
+    return PEOPLE_OP_SUCCESS;
 }
 
 int people_followings(People *self, Set **followings){
-    return SNS_OP_SUCCESS;
+    return PEOPLE_OP_SUCCESS;
 }
 
 int people_followers(People *self, Set **followers){
-    return SNS_OP_SUCCESS;
+    return PEOPLE_OP_SUCCESS;
 }
 
 int people_friends(People *self, Set **friends){
-    return SNS_OP_SUCCESS;
+    return PEOPLE_OP_SUCCESS;
 }
 
 int people_is_following(People *self, People *target, int *is_following){
-    return SNS_OP_SUCCESS;
+    return PEOPLE_OP_SUCCESS;
 }
 
 int people_is_follower(People *self, People *target, int *is_follower){
-    return SNS_OP_SUCCESS;
+    return PEOPLE_OP_SUCCESS;
 }
 
 int people_is_friend(People *self, People *target, int *is_friend){
-    return SNS_OP_SUCCESS;
+    return PEOPLE_OP_SUCCESS;
 }
 
 int people_common_followings(People *self, People *target, Set **common_followings){
-    return SNS_OP_SUCCESS;
+    return PEOPLE_OP_SUCCESS;
 }
 
 int people_common_followers(People *self, People *target, Set **common_followers){
-    return SNS_OP_SUCCESS;
+    return PEOPLE_OP_SUCCESS;
 }
 
 int people_extend_friends(Set *universal, People *self, Set **extend_friends){
-    return SNS_OP_SUCCESS;
+    return PEOPLE_OP_SUCCESS;
 }
