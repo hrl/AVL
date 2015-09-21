@@ -194,12 +194,30 @@ int set_intersection(Set *set_a, Set *set_b, Set **result_intersection, int (*co
     return SET_OP_SUCCESS;
 }
 
-int _set_union(const void *data, void *pipe){
+int _set_extend(const void *data, void *pipe){
     _Set_common_pipe *_pipe=NULL;
     _pipe = (_Set_common_pipe*)pipe;
     int result;
     result = _set_init_or_insert(&(_pipe->result), 1, (void *)data, _pipe->compar);
     if(result != SET_OP_SUCCESS)return result;
+
+    return SET_OP_SUCCESS;
+}
+
+int set_extend(Set *set_a, Set *set_b, int (*compar)(const void *, const void *)){
+    if(set_a == NULL || set_b == NULL){
+        return SET_UNINIT_ERROR;
+    }
+    int result;
+    _Set_common_pipe *_pipe=NULL;
+    _set_common_pipe_init(&_pipe, compar);
+
+    _pipe->result = set_a;
+
+    result = set_map(set_b, _pipe, _set_extend);
+    if(result != SET_OP_SUCCESS)return result;
+
+    _set_common_pipe_del(&_pipe);
 
     return SET_OP_SUCCESS;
 }
@@ -216,9 +234,9 @@ int set_union(Set *set_a, Set *set_b, Set **result_union, int (*compar)(const vo
     _Set_common_pipe *_pipe=NULL;
     _set_common_pipe_init(&_pipe, compar);
 
-    result = set_map(set_a, _pipe, _set_union);
+    result = set_map(set_a, _pipe, _set_extend);
     if(result != SET_OP_SUCCESS)return result;
-    result = set_map(set_b, _pipe, _set_union);
+    result = set_map(set_b, _pipe, _set_extend);
     if(result != SET_OP_SUCCESS)return result;
 
     *result_union = _pipe->result;
