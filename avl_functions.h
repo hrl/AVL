@@ -7,8 +7,7 @@
 
 #include "avl_structs.h"
 
-int avl_init(Tree **self);
-int avl_init_with_data(Tree **self, void *data);
+int avl_init(Tree **self, void *data);
 int avl_del(Tree **self);
 int avl_height_direct(Tree *self);
 int avl_search(Tree *self, void *data, Tree **result, int (*compar)(const void *, const void *));

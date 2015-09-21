@@ -8,11 +8,13 @@
 #include "avl_structs.h"
 #include "avl_defines.h"
 
+// NULL: empty tree
+
 int _max(int a, int b){
     return a>b?a:b;
 }
 
-int avl_init(Tree **self){
+int avl_init(Tree **self, void *data) {
     if(*self != NULL){
         return TREE_INITED_ERROR;
     }
@@ -22,19 +24,10 @@ int avl_init(Tree **self){
         return TREE_INIT_FAIL_ERROR;
     }
 
-    (*self)->data = NULL;
+    (*self)->data = data;
     (*self)->height = 1;
     (*self)->left = NULL;
     (*self)->right = NULL;
-
-    return TREE_OP_SUCCESS;
-}
-
-int avl_init_with_data(Tree **self, void *data) {
-    int result;
-    result = avl_init(self);
-    if(result != TREE_OP_SUCCESS)return result;
-    (*self)->data = data;
     return TREE_OP_SUCCESS;
 }
 
@@ -118,7 +111,7 @@ int _avl_double_rotate_with_right(Tree **self){
 
 int avl_insert(Tree **self, void *data, int (*compar)(const void *, const void *)){
     if(*self == NULL){
-        return TREE_UNINIT_ERROR;
+        return avl_init(self, data);
     }
 
     int result=TREE_OP_SUCCESS;
@@ -129,7 +122,7 @@ int avl_insert(Tree **self, void *data, int (*compar)(const void *, const void *
     }
     if(compar_result < 0){
         if((*self)->left == NULL){
-            result = avl_init_with_data(&((*self)->left), data);
+            result = avl_init(&((*self)->left), data);
             if(result != TREE_OP_SUCCESS)return TREE_INSERT_FAIL_ERROR;
         } else {
             result = avl_insert(&((*self)->left), data, compar);
@@ -145,7 +138,7 @@ int avl_insert(Tree **self, void *data, int (*compar)(const void *, const void *
         }
     } else {
         if((*self)->right == NULL){
-            result = avl_init_with_data(&((*self)->right), data);
+            result = avl_init(&((*self)->right), data);
             if(result != TREE_OP_SUCCESS)return result;
         } else {
             result = avl_insert(&((*self)->right), data, compar);

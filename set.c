@@ -10,7 +10,11 @@
 #include "avl_defines.h"
 #include "set_defines.h"
 
+// NULL : UNINIT
+// size == 0 (_tree == NULL) : null set
+
 int set_init(Set **self){
+    // create a null set
     if(*self != NULL){
         return SET_INITED_ERROR;
     }
@@ -22,27 +26,17 @@ int set_init(Set **self){
 
     (*self)->size = 0;
     (*self)->_tree = NULL;
-    int result;
-    result = avl_init(&((*self)->_tree));
-    if(result != TREE_OP_SUCCESS)return SET_INIT_FAIL_ERROR;
 
     return SET_OP_SUCCESS;
 }
 
 int set_init_with_data(Set **self, void *data) {
-    if(*self != NULL){
-        return SET_INITED_ERROR;
-    }
-
-    *self = (Set*)malloc(sizeof(Set));
-    if(*self == NULL){
-        return SET_INIT_FAIL_ERROR;
-    }
+    int result;
+    result = set_init(self);
+    if(result != SET_OP_SUCCESS)return result;
 
     (*self)->size = 1;
-    (*self)->_tree = NULL;
-    int result;
-    result = avl_init_with_data(&((*self)->_tree), data);
+    result = avl_init(&((*self)->_tree), data);
     if(result != TREE_OP_SUCCESS)return SET_INIT_FAIL_ERROR;
 
     return SET_OP_SUCCESS;
