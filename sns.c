@@ -196,10 +196,30 @@ int people_del(Sns *universal, People **self){
 }
 
 int people_follow(People *self, People *target){
+    if(self == NULL || target == NULL){
+        return PEOPLE_UNINIT_ERROR;
+    }
+
+    int result;
+    result = set_insert(&(self->_followings), target, people_compar);
+    if(result != SET_OP_SUCCESS) return PEOPLE_FOLLOW_FAIL_ERROR;
+    result = set_insert(&(target->_followers), self, people_compar);
+    if(result != SET_OP_SUCCESS) return PEOPLE_FOLLOW_FAIL_ERROR;
+
     return PEOPLE_OP_SUCCESS;
 }
 
 int people_friend(People *self, People *target){
+    if(self == NULL || target == NULL){
+        return PEOPLE_UNINIT_ERROR;
+    }
+
+    int result;
+    result = set_insert(&(self->_friends), target, people_compar);
+    if(result != SET_OP_SUCCESS) return PEOPLE_FRIEND_FAIL_ERROR;
+    result = set_insert(&(target->__incoming_friends), self, people_compar);
+    if(result != SET_OP_SUCCESS) return PEOPLE_FRIEND_FAIL_ERROR;
+
     return PEOPLE_OP_SUCCESS;
 }
 
