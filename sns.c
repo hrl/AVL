@@ -57,7 +57,7 @@ int sns_search(Sns *self, People *people, People **result_people, int *result_fo
     }
 
     int result;
-    result = set_search(self->_peoples, people, result_people, result_found, people_compar);
+    result = set_search(self->_peoples, people, (void **)result_people, result_found, people_compar);
     if(result != SET_OP_SUCCESS) return SNS_SEARCH_ERROR;
 
     return SNS_OP_SUCCESS;
