@@ -147,6 +147,15 @@ int _set_common_pipe_init(_Set_common_pipe **_pipe, int (*compar)(const void *, 
     return SET_OP_SUCCESS;
 }
 
+int _set_common_pipe_del(_Set_common_pipe **_pipe){
+    if(*_pipe == NULL){
+        return SET_OP_SUCCESS;
+    }
+    free(*_pipe);
+    *_pipe = NULL;
+    return SET_OP_SUCCESS;
+}
+
 int _set_intersection(const void *data, void *pipe){
     _Set_common_pipe *_pipe=NULL;
     _pipe = (_Set_common_pipe*)pipe;
@@ -180,6 +189,8 @@ int set_intersection(Set *set_a, Set *set_b, Set **result_intersection, int (*co
 
     *result_intersection = _pipe->result;
 
+    _set_common_pipe_del(&_pipe);
+
     return SET_OP_SUCCESS;
 }
 
@@ -211,6 +222,8 @@ int set_union(Set *set_a, Set *set_b, Set **result_union, int (*compar)(const vo
     if(result != SET_OP_SUCCESS)return result;
 
     *result_union = _pipe->result;
+
+    _set_common_pipe_del(&_pipe);
 
     return SET_OP_SUCCESS;
 }
@@ -248,6 +261,8 @@ int set_difference(Set *set_a, Set *set_b, Set **result_difference, int (*compar
 
     *result_difference = _pipe->result;
 
+    _set_common_pipe_del(&_pipe);
+
     return SET_OP_SUCCESS;
 }
 
@@ -284,6 +299,8 @@ int set_is_subset(Set *set_a, Set *set_b, int *result_is_subset, int (*compar)(c
     if(result != SET_OP_SUCCESS)return result;
 
     *result_is_subset = _pipe->result_int;
+
+    _set_common_pipe_del(&_pipe);
 
     return SET_OP_SUCCESS;
 }
