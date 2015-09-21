@@ -257,14 +257,38 @@ int people_friends(People *self, Set **friends){
 }
 
 int people_is_following(People *self, People *target, int *is_following){
+    if(self == NULL || target == NULL){
+        return PEOPLE_UNINIT_ERROR;
+    }
+
+    int result;
+    result = set_is_member(self->_followings, target, is_following, people_compar);
+    if(result != SET_OP_SUCCESS) return PEOPLE_SEARCH_FAIL_ERROR;
+
     return PEOPLE_OP_SUCCESS;
 }
 
 int people_is_follower(People *self, People *target, int *is_follower){
+    if(self == NULL || target == NULL){
+        return PEOPLE_UNINIT_ERROR;
+    }
+
+    int result;
+    result = set_is_member(self->_followers, target, is_follower, people_compar);
+    if(result != SET_OP_SUCCESS) return PEOPLE_SEARCH_FAIL_ERROR;
+
     return PEOPLE_OP_SUCCESS;
 }
 
 int people_is_friend(People *self, People *target, int *is_friend){
+    if(self == NULL || target == NULL){
+        return PEOPLE_UNINIT_ERROR;
+    }
+
+    int result;
+    result = set_is_member(self->_friends, target, is_friend, people_compar);
+    if(result != SET_OP_SUCCESS) return PEOPLE_SEARCH_FAIL_ERROR;
+
     return PEOPLE_OP_SUCCESS;
 }
 
