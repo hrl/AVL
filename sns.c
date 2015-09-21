@@ -117,6 +117,7 @@ int people_init(Sns *universal, People **self, char name[100]){
 struct _people_common_pipe {
     People *self;
     int refresh_shift;
+    Set *result_set;
     int (*compar)(const void *, const void *);
 };
 typedef struct _people_common_pipe _People_common_pipe;
@@ -125,6 +126,7 @@ int _people_common_pipe_init(_People_common_pipe **_pipe, int (*compar)(const vo
     *_pipe = (_People_common_pipe*)malloc(sizeof(_People_common_pipe));
     (*_pipe)->self = NULL;
     (*_pipe)->refresh_shift = 0;
+    (*_pipe)->result_set = NULL;
     (*_pipe)->compar = compar;
     return PEOPLE_OP_SUCCESS;
 }
@@ -329,6 +331,44 @@ int people_common_followers(People *self, People *target, Set **common_followers
     return PEOPLE_OP_SUCCESS;
 }
 
+int _people_extend_friends(const void *data, void *_pipe){
+    _People_common_pipe *pipe=NULL;
+    pipe = (_People_common_pipe*)_pipe;
+    People *friend=NULL;
+    friend = (People*)data;
+
+    int result;
+    result = set_extend(pipe->result_set, friend->_friends, pipe->compar);
+    if(result != SET_OP_SUCCESS) return PEOPLE_CIRCLE_FAIL_ERROR;
+
+    return PEOPLE_OP_SUCCESS;
+}
+
 int people_extend_friends(Set *universal, People *self, Set **extend_friends){
+    if(universal == NULL){
+        return SNS_UNINIT_ERROR;
+    }
+    if(self == NULL){
+        return PEOPLE_UNINIT_ERROR;
+    }
+    if(*extend_friends != NULL){
+        return SET_INITED_ERROR;
+    }
+
+    _People_common_pipe *_pipe=NULL;
+    _people_common_pipe_init(&_pipe, people_compar);
+
+    _pipe->self = self;
+
+    int result;
+    result = set_map(self->_friends, _pipe, _people_extend_friends);
+    if(result != SET_OP_SUCCESS) return PEOPLE_CIRCLE_FAIL_ERROR;
+    result = set_delete(&(_pipe->result_set), self, people_compar);
+    if(result != SET_OP_SUCCESS) return PEOPLE_CIRCLE_FAIL_ERROR;
+
+    *extend_friends = _pipe->result_set;
+
+    _people_common_pipe_del(&_pipe);
+
     return PEOPLE_OP_SUCCESS;
 }
