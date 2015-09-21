@@ -9,6 +9,7 @@
 
 int set_init(Set **self);
 int set_del(Set **self);
+int set_search(Set *self, void *data, void **result_data, int *result_found, int (*compar)(const void *, const void *));
 int set_is_member(Set *self, void *data, int *result_is_member, int (*compar)(const void *, const void *));
 int set_insert(Set **self, void *data, int (*compar)(const void *, const void *));
 int set_delete(Set **self, void *data, int (*compar)(const void *, const void *));

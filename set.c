@@ -42,18 +42,26 @@ int set_del(Set **self){
     return SET_OP_SUCCESS;
 }
 
+int set_search(Set *self, void *data, void **result_data, int *result_found, int (*compar)(const void *, const void *)){
+    if(self == NULL){
+        return SET_UNINIT_ERROR;
+    }
+
+    int result;
+    result = avl_search(self->_tree, data, result_data, result_found, compar);
+    if(result != TREE_OP_SUCCESS) return SET_SEARCH_ERROR;
+    return SET_OP_SUCCESS;
+}
+
 int set_is_member(Set *self, void *data, int *result_is_member, int (*compar)(const void *, const void *)){
     if(self == NULL){
         return SET_UNINIT_ERROR;
     }
 
-    Tree *result_search=NULL;
-    avl_search(self->_tree, data, &result_search, compar);
-    if(result_search == NULL){
-        *result_is_member = 0;
-    } else {
-        *result_is_member = 1;
-    }
+    void *result_data=NULL;
+    int result;
+    result = set_search(self, data, &result_data, result_is_member, compar);
+    if(result != SET_OP_SUCCESS) return SET_SEARCH_ERROR;
 
     return SET_OP_SUCCESS;
 }
