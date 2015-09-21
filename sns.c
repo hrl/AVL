@@ -195,11 +195,11 @@ int people_del(Sns *universal, People **self){
     return PEOPLE_OP_SUCCESS;
 }
 
-int people_follow(Sns *universal, People *self, People *target){
+int people_follow(People *self, People *target){
     return PEOPLE_OP_SUCCESS;
 }
 
-int people_friend(Sns *universal, People *self, People *target){
+int people_friend(People *self, People *target){
     return PEOPLE_OP_SUCCESS;
 }
 
