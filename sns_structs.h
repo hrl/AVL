@@ -9,7 +9,7 @@
 
 struct sns {
     int id_max;
-    Set *peoples;
+    Set *_peoples;
 };
 
 struct people {

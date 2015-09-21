@@ -19,10 +19,30 @@ int people_compar(const void *a, const void *b){
 }
 
 int sns_init(Sns **self){
+    if(*self != NULL){
+        return SNS_INITED_ERROR;
+    }
+
+    *self = (Sns*)malloc(sizeof(Sns));
+    if(*self == NULL) {
+        return SNS_INIT_FAIL_ERROR;
+    }
+
+    (*self)->id_max = 0;
+    (*self)->_peoples = NULL;
+
     return SNS_OP_SUCCESS;
 }
 
 int sns_del(Sns **self){
+    if(*self == NULL){
+        return SNS_OP_SUCCESS;
+    }
+
+    set_del(&((*self)->_peoples));
+    free(*self);
+    *self = NULL;
+
     return SNS_OP_SUCCESS;
 }
 
