@@ -70,6 +70,22 @@ int sns_insert(Sns *self, People *people){
     return SNS_OP_SUCCESS;
 }
 
+int sns_delete(Sns *self, People *people){
+    if(self == NULL){
+        return SNS_UNINIT_ERROR;
+    }
+
+    if(people == NULL){
+        return PEOPLE_UNINIT_ERROR;
+    }
+
+    int result;
+    result = set_delete(&(self->_peoples), people, people_compar);
+    if(result != SET_OP_SUCCESS) return SNS_DELETE_FAIL_ERROR;
+
+    return SNS_OP_SUCCESS;
+}
+
 int people_init(Sns *universal, People **self, char name[100]){
     if(universal == NULL){
         return SNS_UNINIT_ERROR;
@@ -89,6 +105,7 @@ int people_init(Sns *universal, People **self, char name[100]){
     (*self)->_followings = NULL;
     (*self)->_followers = NULL;
     (*self)->_friends = NULL;
+    (*self)->__incoming_friends = NULL;
 
     int result;
     result = sns_insert(universal, *self);
@@ -97,7 +114,73 @@ int people_init(Sns *universal, People **self, char name[100]){
     return PEOPLE_OP_SUCCESS;
 }
 
+struct _people_common_pipe {
+    People *self;
+    int refresh_shift;
+    int (*compar)(const void *, const void *);
+};
+typedef struct _people_common_pipe _People_common_pipe;
+
+int _people_common_pipe_init(_People_common_pipe **_pipe, int (*compar)(const void *, const void *)){
+    *_pipe = (_People_common_pipe*)malloc(sizeof(_People_common_pipe));
+    (*_pipe)->self = NULL;
+    (*_pipe)->refresh_shift = 0;
+    (*_pipe)->compar = compar;
+    return PEOPLE_OP_SUCCESS;
+}
+
+int _people_del_refresh_set(const void *data, void *_pipe){
+    _People_common_pipe *pipe;
+    pipe = (_People_common_pipe*)_pipe;
+    Set *target_set;
+    target_set = (Set*) ((char*)data + pipe->refresh_shift);
+    int result;
+    result = set_delete(&target_set, pipe->self, pipe->compar);
+    if(result != SET_OP_SUCCESS) return PEOPLE_DEL_FAIL_ERROR;
+    return PEOPLE_OP_SUCCESS;
+}
+
 int people_del(Sns *universal, People **self){
+    if(universal == NULL){
+        return SNS_UNINIT_ERROR;
+    }
+
+    if(*self == NULL){
+        return PEOPLE_OP_SUCCESS;
+    }
+
+    _People_common_pipe *_pipe=NULL;
+    _people_common_pipe_init(&_pipe, people_compar);
+
+    _pipe->self = *self;
+
+    // refresh followers' followings set
+    _pipe->refresh_shift = 0;
+    set_map((*self)->_followers, _pipe, _people_del_refresh_set);
+
+    // refresh followings' followers set
+    _pipe->refresh_shift += sizeof(Set*);
+    set_map((*self)->_followings, _pipe, _people_del_refresh_set);
+
+    // refresh incoming friends' friends set
+    _pipe->refresh_shift += sizeof(Set*);
+    set_map((*self)->__incoming_friends, _pipe, _people_del_refresh_set);
+
+    // refresh friends' incoming friends set
+    _pipe->refresh_shift += sizeof(Set*);
+    set_map((*self)->_friends, _pipe, _people_del_refresh_set);
+
+    // refresh universal set
+    sns_delete(universal, *self);
+
+    // delete self
+    set_del(&((*self)->_followings));
+    set_del(&((*self)->_followers));
+    set_del(&((*self)->_friends));
+    set_del(&((*self)->__incoming_friends));
+    free(*self);
+    *self = NULL;
+
     return PEOPLE_OP_SUCCESS;
 }
 

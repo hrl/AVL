@@ -13,11 +13,12 @@ struct sns {
 };
 
 struct people {
-    int id;
-    char name[100];
     Set *_followings;
     Set *_followers;
     Set *_friends;
+    Set *__incoming_friends;
+    int id;
+    char name[100];
 };
 
 typedef struct sns Sns;
