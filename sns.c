@@ -4,6 +4,7 @@
 
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 #include "set_functions.h"
 #include "sns_functions.h"
 #include "set_structs.h"
@@ -46,8 +47,8 @@ int sns_del(Sns **self){
     return SNS_OP_SUCCESS;
 }
 
-int sns_insert(Sns **self, People *people){
-    if(*self == NULL){
+int sns_insert(Sns *self, People *people){
+    if(self == NULL){
         return SNS_UNINIT_ERROR;
     }
 
@@ -58,18 +59,18 @@ int sns_insert(Sns **self, People *people){
     people->id = (*self)->id_max + 1;
 
     int result;
-    if((*self)->_peoples == NULL){
-        result = set_init_with_data(&((*self)->_peoples), people);
+    if(self->_peoples == NULL){
+        result = set_init_with_data(&(self->_peoples), people);
     } else {
-        result = set_insert(&((*self)->_peoples), people, people_compar);
+        result = set_insert(&(self->_peoples), people, people_compar);
     }
     if(result != SET_OP_SUCCESS) return SNS_INSERT_FAIL_ERROR;
-    (*self)->id_max++;
+    self->id_max++;
 
     return SNS_OP_SUCCESS;
 }
 
-int people_init(Sns *universal, People **self){
+int people_init(Sns *universal, People **self, char name[100]){
     if(universal == NULL){
         return SNS_UNINIT_ERROR;
     }
@@ -82,7 +83,16 @@ int people_init(Sns *universal, People **self){
     if(*self == NULL) {
         return PEOPLE_INIT_FAIL_ERROR;
     }
-    // init
+
+    (*self)->id = 0;
+    strcpy((*self)->name, name);
+    (*self)->_followings = NULL;
+    (*self)->_followers = NULL;
+    (*self)->_friends = NULL;
+
+    int result;
+    result = sns_insert(universal, *self);
+    if(result != SNS_OP_SUCCESS) return PEOPLE_INIT_FAIL_ERROR;
 
     return PEOPLE_OP_SUCCESS;
 }

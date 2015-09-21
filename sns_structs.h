@@ -15,9 +15,9 @@ struct sns {
 struct people {
     int id;
     char name[100];
-    Set *friends;
-    Set *followings;
-    Set *followers;
+    Set *_followings;
+    Set *_followers;
+    Set *_friends;
 };
 
 typedef struct sns Sns;

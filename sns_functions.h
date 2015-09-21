@@ -10,8 +10,8 @@
 int people_compar(const void *a, const void *b);
 int sns_init(Sns **self);
 int sns_del(Sns **self);
-int sns_insert(Sns **self, People *people);
-int people_init(Sns *universal, People **self);
+int sns_insert(Sns *self, People *people);
+int people_init(Sns *universal, People **self, char name[100]);
 int people_del(Sns *universal, People **self);
 int people_follow(Sns *universal, People *self, People *target);
 int people_friend(Sns *universal, People *self, People *target);
