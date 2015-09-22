@@ -17,6 +17,7 @@ int set_intersection(Set *set_a, Set *set_b, Set **result_intersection, int (*co
 int set_union(Set *set_a, Set *set_b, Set **result_union, int (*compar)(const void *, const void *));
 int set_extend(Set *set_a, Set *set_b, int (*compar)(const void *, const void *));
 int set_difference(Set *set_a, Set *set_b, Set **result_difference, int (*compar)(const void *, const void *));
+int set_contract(Set *set_a, Set *set_b, int (*compar)(const void *, const void *));
 int set_is_subset(Set *set_a, Set *set_b, int *result_is_subset, int (*compar)(const void *, const void *));
 int set_is_equal(Set *set_a, Set *set_b, int *result_is_equal, int (*compar)(const void *, const void *));
 int set_map(Set *self, void *pipe, int (*callback)(const void *, void *));

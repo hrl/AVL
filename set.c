@@ -273,6 +273,39 @@ int set_difference(Set *set_a, Set *set_b, Set **result_difference, int (*compar
     return SET_OP_SUCCESS;
 }
 
+int _set_contract(const void *data, void *pipe){
+    _Set_common_pipe *_pipe=NULL;
+    _pipe = (_Set_common_pipe*)pipe;
+    int result, search_result;
+    result = set_is_member(_pipe->set_large, (void *)data, &search_result, _pipe->compar);
+    if(result != SET_OP_SUCCESS)return result;
+    if(search_result != 0){
+        result = set_delete(&(_pipe->set_large), (void *)data, _pipe->compar);
+        if(result != SET_OP_SUCCESS)return SET_DIFFERENCE_ERROR;
+    }
+    return SET_OP_SUCCESS;
+}
+
+int set_contract(Set *set_a, Set *set_b, int (*compar)(const void *, const void *)){
+    if(set_a == NULL || set_b == NULL){
+        return SET_UNINIT_ERROR;
+    }
+
+    int result;
+    _Set_common_pipe *_pipe=NULL;
+    _set_common_pipe_init(&_pipe, compar);
+
+    // large is nonsensical here
+    _pipe->set_large = set_a;
+
+    result = set_map(set_b, _pipe, _set_contract);
+    if(result != SET_OP_SUCCESS)return result;
+
+    _set_common_pipe_del(&_pipe);
+
+    return SET_OP_SUCCESS;
+}
+
 int _set_is_subset(const void *data, void *pipe) {
     _Set_common_pipe *_pipe = NULL;
     _pipe = (_Set_common_pipe *) pipe;
