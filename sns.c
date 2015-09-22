@@ -473,7 +473,7 @@ int sns_insert_people(Sns *self, People *people, int id_given){
     if(result != SET_OP_SUCCESS) return SNS_INSERT_FAIL_ERROR;
 
     if(id_given == 1){
-        self->peoples_id_max = _sns_int_max(self->peoples_id_max+1, people->id);
+        self->peoples_id_max = _sns_int_max(self->peoples_id_max, people->id);
     } else {
         self->peoples_id_max++;
     }
@@ -499,7 +499,7 @@ int sns_insert_tag(Sns *self, Tag *tag, int id_given){
     if (result != SET_OP_SUCCESS) return SNS_INSERT_FAIL_ERROR;
 
     if(id_given == 1){
-        self->tags_id_max = _sns_int_max(self->tags_id_max+1, tag->id);
+        self->tags_id_max = _sns_int_max(self->tags_id_max, tag->id);
     } else {
         self->tags_id_max++;
     }
