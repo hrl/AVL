@@ -98,6 +98,13 @@ int sns_delete(Sns *self, People *people){
     return SNS_OP_SUCCESS;
 }
 
+int sns_map(Sns *self, void *pipe, int (*callback)(const void *, void *)){
+    int result;
+    result = set_map(self->_peoples, pipe, callback);
+    if(result != SET_OP_SUCCESS)return result;
+    return SNS_OP_SUCCESS;
+}
+
 int people_init(Sns *universal, People **self, char name[100]){
     if(universal == NULL){
         return SNS_UNINIT_ERROR;
