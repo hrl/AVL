@@ -630,6 +630,7 @@ void gui_sns_people_follow(void *pass, int call_type){
         int result;
         result = _gui_sns_people_people_id_dialog(people, "添加新关注", people_follow);
         if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
+        sns_changed = 1;
     }
 
     _gui_call_last_func();
@@ -642,6 +643,7 @@ void gui_sns_people_friend(void *pass, int call_type){
         int result;
         result = _gui_sns_people_people_id_dialog(people, "添加新好友", people_friend);
         if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
+        sns_changed = 1;
     }
 
     _gui_call_last_func();
@@ -654,6 +656,7 @@ void gui_sns_people_tag(void *pass, int call_type){
         int result;
         result = _gui_sns_people_people_id_dialog(people, "添加新爱好", people_tag);
         if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
+        sns_changed = 1;
     }
 
     _gui_call_last_func();
