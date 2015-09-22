@@ -126,11 +126,12 @@ int people_init(Sns *universal, People **self, char name[100]){
     Set **wait_init=&((*self)->_followings);
     int i;
     int result;
-    for(i=0; i<4; i++){
+    for(i=0; i<5; i++){
         // 0: _followings
         // 1: _followers
         // 2: _friends
         // 3: __incoming_friends
+        // 4: _tags
         *wait_init = NULL;
         result = set_init(wait_init);
         if(result != SET_OP_SUCCESS) return PEOPLE_INIT_FAIL_ERROR;
@@ -224,6 +225,7 @@ int people_del(Sns *universal, People **self){
     set_del(&((*self)->_followers));
     set_del(&((*self)->_friends));
     set_del(&((*self)->__incoming_friends));
+    set_del(&((*self)->_tags));
     free(*self);
     *self = NULL;
 

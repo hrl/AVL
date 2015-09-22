@@ -20,6 +20,7 @@ struct people {
     Set *_followers;
     Set *_friends;
     Set *__incoming_friends;
+    Set *_tags;
 };
 
 typedef struct sns Sns;
