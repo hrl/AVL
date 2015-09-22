@@ -13,13 +13,13 @@ int tag_compar(const void *a, const void *b);
 int people_compar(const void *a, const void *b);
 
 // sns
-int sns_json_file_read(char *filename, cJSON **result);
+int sns_json_file_read(Sns **self, char *filename);
 int sns_json_file_load(Sns **self, cJSON *data);
 int sns_json_file_write(Sns *self, char *filename);
 int sns_init(Sns **self);
 int sns_del(Sns **self);
-int sns_search_people(Sns *self, People *people, People **result_people, int *result_found);
-int sns_search_tag(Sns *self, Tag *tag, Tag **result_tag, int *result_found);
+int sns_search_people(Sns *self, int id, People **result_people);
+int sns_search_tag(Sns *self, int id, Tag **result_tag);
 int sns_insert_people(Sns *self, People *people, int id_given);
 int sns_insert_tag(Sns *self, Tag *tag, int id_given);
 int sns_delete_people(Sns *self, People *people);

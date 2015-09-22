@@ -32,7 +32,7 @@ int people_compar(const void *a, const void *b){
     return A->id - B->id;
 }
 
-int sns_json_file_read(char* filename, cJSON **result){
+int sns_json_file_read(Sns **self, char *filename){
     FILE *file=NULL;
     file = fopen(filename, "rb");
     if(file == NULL){
@@ -46,17 +46,168 @@ int sns_json_file_read(char* filename, cJSON **result){
     fread(data, 1, len, file);
     fclose(file);
 
-    *result = cJSON_Parse(data);
+    cJSON *json=NULL;
+    json = cJSON_Parse(data);
     free(data);
 
-    if(*result == NULL){
+    if(json == NULL){
         return SNS_JSON_DECODE_FAIL_ERROR;
     }
+
+    int result;
+    result = sns_json_file_load(self, json);
+    if(result != SNS_OP_SUCCESS) return result;
 
     return SNS_OP_SUCCESS;
 }
 
+
 int sns_json_file_load(Sns **self, cJSON *data){
+    if(*self != NULL){
+        return SNS_INITED_ERROR;
+    }
+
+    if(data == NULL){
+        return SNS_JSON_DECODE_FAIL_ERROR;
+    }
+
+    int result;
+    result = sns_init(self);
+    if(result != SNS_OP_SUCCESS) return result;
+
+    cJSON *array_peoples=NULL;
+    cJSON *array_tags=NULL;
+    array_peoples = cJSON_GetObjectItem(data, "peoples");
+    array_tags = cJSON_GetObjectItem(data, "tags");
+
+    // first loop, load peoples
+    cJSON *object_people_iterator=NULL;
+    People *people=NULL;
+    int people_id_tmp;
+    char people_name_tmp[100];
+    if(cJSON_GetArraySize(array_peoples) != 0){
+        object_people_iterator = cJSON_GetArrayItem(array_peoples, 0);
+        while(object_people_iterator != NULL){
+            people_id_tmp = cJSON_GetObjectItem(object_people_iterator, "id")->valueint;
+            strcpy(people_name_tmp, cJSON_GetObjectItem(object_people_iterator, "name")->valuestring);
+            result = people_init(*self, &people, people_name_tmp, people_id_tmp, 1);
+            if(result != SNS_OP_SUCCESS) return result;
+
+            people = NULL;
+            object_people_iterator = object_people_iterator->next;
+        }
+    }
+
+    // first loop, load tags
+    cJSON *object_tag_iterator=NULL;
+    Tag *tag=NULL;
+    int tag_id_tmp;
+    char tag_name_tmp[100];
+    if(cJSON_GetArraySize(array_tags) != 0) {
+        object_tag_iterator = cJSON_GetArrayItem(array_tags, 0);
+        while(object_tag_iterator != NULL) {
+            tag_id_tmp = cJSON_GetObjectItem(object_tag_iterator, "id")->valueint;
+            strcpy(tag_name_tmp, cJSON_GetObjectItem(object_tag_iterator, "name")->valuestring);
+            result = tag_init(*self, &tag, tag_name_tmp, tag_id_tmp, 1);
+            if(result != SNS_OP_SUCCESS) return result;
+
+            tag = NULL;
+            object_tag_iterator = object_tag_iterator->next;
+        }
+    }
+
+    // second loop, fix relationships
+    People *people_target=NULL;
+    Tag *tag_target=NULL;
+    int people_found_tmp;
+    int tag_found_tmp;
+    cJSON *array_people_followings=NULL;
+    cJSON *object_people_following_iterator=NULL;
+    cJSON *array_people_friends=NULL;
+    cJSON *object_people_friend_iterator=NULL;
+    cJSON *array_people_tags=NULL;
+    cJSON *object_people_tag_iterator=NULL;
+    if(cJSON_GetArraySize(array_peoples) != 0){
+        object_people_iterator = cJSON_GetArrayItem(array_peoples, 0);
+        while(object_people_iterator != NULL){
+            // get current people
+            people_id_tmp = cJSON_GetObjectItem(object_people_iterator, "id")->valueint;
+            result = sns_search_people(*self, people_id_tmp, &people);
+            if(result != SNS_OP_SUCCESS) return result;
+            if(people == NULL){
+                return SNS_JSON_DECODE_FAIL_ERROR;
+            }
+
+            // fix following/follower
+            array_people_followings = cJSON_GetObjectItem(object_people_iterator, "followings");
+            if(cJSON_GetArraySize(array_people_followings) != 0){
+                object_people_following_iterator = cJSON_GetArrayItem(array_people_followings, 0);
+                while(object_people_following_iterator != NULL){
+                    // get target people
+                    people_id_tmp = object_people_following_iterator->valueint;
+                    result = sns_search_people(*self, people_id_tmp, &people_target);
+                    if(result != SNS_OP_SUCCESS) return result;
+                    if(people_target == NULL){
+                        return SNS_JSON_DECODE_FAIL_ERROR;
+                    }
+
+                    // fix relationship
+                    result = people_follow(people, people_target);
+                    if(result != SNS_OP_SUCCESS) return result;
+
+                    people_target = NULL;
+                    object_people_following_iterator = object_people_following_iterator->next;
+                }
+            }
+            // fix friend/incoming_friend
+            array_people_friends = cJSON_GetObjectItem(object_people_iterator, "friends");
+            if(cJSON_GetArraySize(array_people_friends) != 0){
+                object_people_friend_iterator = cJSON_GetArrayItem(array_people_friends, 0);
+                while(object_people_friend_iterator != NULL){
+                    // get target people
+                    people_id_tmp = object_people_friend_iterator->valueint;
+                    result = sns_search_people(*self, people_id_tmp, &people_target);
+                    if(result != SNS_OP_SUCCESS) return result;
+                    if(people_target == NULL){
+                        return SNS_JSON_DECODE_FAIL_ERROR;
+                    }
+
+                    // fix relationship
+                    result = people_friend(people, people_target);
+                    if(result != SNS_OP_SUCCESS) return result;
+
+                    people_target = NULL;
+                    object_people_friend_iterator = object_people_friend_iterator->next;
+                }
+            }
+            // fix tag
+            array_people_tags = cJSON_GetObjectItem(object_people_iterator, "tags");
+            if(cJSON_GetArraySize(array_people_tags) != 0){
+                object_people_tag_iterator = cJSON_GetArrayItem(array_people_tags, 0);
+                while(object_people_tag_iterator != NULL){
+                    // get target tag
+                    tag_id_tmp = object_people_tag_iterator->valueint;
+                    result = sns_search_tag(*self, tag_id_tmp, &tag_target);
+                    if(result != SNS_OP_SUCCESS) return result;
+                    if(tag_target == NULL){
+                        return SNS_JSON_DECODE_FAIL_ERROR;
+                    }
+
+                    // fix relationship
+                    result = people_tag(people, tag_target);
+                    if(result != SNS_OP_SUCCESS) return result;
+
+                    tag_target = NULL;
+                    object_people_tag_iterator = object_people_tag_iterator->next;
+                }
+            }
+
+            people = NULL;
+            people_found_tmp = 0;
+            object_people_iterator = object_people_iterator->next;
+        }
+    }
+
     return SNS_OP_SUCCESS;
 }
 
@@ -250,34 +401,57 @@ int sns_del(Sns **self){
     return SNS_OP_SUCCESS;
 }
 
-int sns_search_people(Sns *self, People *people, People **result_people, int *result_found){
+int _sns_create_dummy_people(People **self){
+    *self = (People*)malloc(sizeof(People));
+    (*self)->id = 0;
+    (*self)->_followings = NULL;
+    (*self)->_followers = NULL;
+    (*self)->_friends = NULL;
+    (*self)->__incoming_friends = NULL;
+    (*self)->_tags = NULL;
+    return SNS_OP_SUCCESS;
+}
+
+int sns_search_people(Sns *self, int id, People **result_people){
     if(self == NULL){
         return SNS_UNINIT_ERROR;
     }
 
-    if(people == NULL){
-        return PEOPLE_UNINIT_ERROR;
-    }
+    People *people=NULL;
+    _sns_create_dummy_people(&people);
+    people->id = id;
+    int result_found;
 
     int result;
-    result = set_search(self->_peoples, people, (void **)result_people, result_found, people_compar);
+    result = set_search(self->_peoples, people, (void **)result_people, &result_found, people_compar);
     if(result != SET_OP_SUCCESS) return SNS_SEARCH_ERROR;
+
+    free(people);
 
     return SNS_OP_SUCCESS;
 }
 
-int sns_search_tag(Sns *self, Tag *tag, Tag **result_tag, int *result_found){
+int _sns_create_dummy_tag(Tag **self){
+    *self = (Tag*)malloc(sizeof(Tag));
+    (*self)->id = 0;
+    return SNS_OP_SUCCESS;
+}
+
+int sns_search_tag(Sns *self, int id, Tag **result_tag){
     if(self == NULL){
         return SNS_UNINIT_ERROR;
     }
 
-    if(tag == NULL){
-        return TAG_UNINIT_ERROR;
-    }
+    Tag *tag=NULL;
+    _sns_create_dummy_tag(&tag);
+    tag->id = id;
+    int result_found;
 
     int result;
-    result = set_search(self->_tags, tag, (void **)result_tag, result_found, tag_compar);
+    result = set_search(self->_tags, tag, (void **)result_tag, &result_found, tag_compar);
     if(result != SET_OP_SUCCESS) return SNS_SEARCH_ERROR;
+
+    free(tag);
 
     return SNS_OP_SUCCESS;
 }
