@@ -545,6 +545,22 @@ int people_has_friend(People *self, People *target, int *is_friend){
     return PEOPLE_OP_SUCCESS;
 }
 
+int people_has_tag(People *self, Tag *target, int *has_tag){
+    if(self == NULL){
+        return PEOPLE_UNINIT_ERROR;
+    }
+
+    if(target == NULL){
+        return TAG_UNINIT_ERROR;
+    }
+
+    int result;
+    result = set_is_member(self->_tags, target, has_tag, tag_compar);
+    if(result != SET_OP_SUCCESS) return PEOPLE_SEARCH_FAIL_ERROR;
+
+    return PEOPLE_OP_SUCCESS;
+}
+
 int people_common_followings(People *self, People *target, Set **common_followings){
     if(self == NULL || target == NULL){
         return PEOPLE_UNINIT_ERROR;
