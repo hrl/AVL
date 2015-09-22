@@ -509,7 +509,7 @@ int people_tags(People *self, Set **tags){
     return PEOPLE_OP_SUCCESS;
 }
 
-int people_is_following(People *self, People *target, int *is_following){
+int people_has_following(People *self, People *target, int *is_following){
     if(self == NULL || target == NULL){
         return PEOPLE_UNINIT_ERROR;
     }
@@ -521,7 +521,7 @@ int people_is_following(People *self, People *target, int *is_following){
     return PEOPLE_OP_SUCCESS;
 }
 
-int people_is_follower(People *self, People *target, int *is_follower){
+int people_has_follower(People *self, People *target, int *is_follower){
     if(self == NULL || target == NULL){
         return PEOPLE_UNINIT_ERROR;
     }
@@ -533,7 +533,7 @@ int people_is_follower(People *self, People *target, int *is_follower){
     return PEOPLE_OP_SUCCESS;
 }
 
-int people_is_friend(People *self, People *target, int *is_friend){
+int people_has_friend(People *self, People *target, int *is_friend){
     if(self == NULL || target == NULL){
         return PEOPLE_UNINIT_ERROR;
     }
