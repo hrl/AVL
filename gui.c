@@ -261,6 +261,42 @@ void _gui_insert_into_list_store(GtkListStore **liststore, void *data, int type)
     };
 }
 
+void _gui_append_column(char column_title[][20], int column_line[], int cls){
+    GtkCellRenderer *renderer;
+    GtkTreeViewColumn *column;
+    renderer = gtk_cell_renderer_text_new();
+    int i = 0;
+    for(i=0; i<cls; i++){
+        column = gtk_tree_view_column_new_with_attributes(
+            column_title[i],
+            renderer,
+            "text", column_line[i],
+            NULL
+        );
+        gtk_tree_view_column_set_sort_column_id(column, column_line[i]);
+        gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
+    }
+}
+
+void _gui_create_column(int type){
+    switch(type){
+        case PEOPLE_ALL:{
+            char column_title[2][20] = {"ID", "昵称"};
+            int column_line[2] = {PEOPLE_ALL_ID, PEOPLE_ALL_NAME};
+            int cls=2;
+            _gui_append_column(column_title, column_line, cls);
+            break;
+        }
+        case TAG_ALL:{
+            char column_title[2][20] = {"ID", "名称"};
+            int column_line[2] = {TAG_ALL_ID, TAG_ALL_NAME};
+            int cls=2;
+            _gui_append_column(column_title, column_line, cls);
+            break;
+        }
+    };
+}
+
 /* Menu function */
 void gui_sns_file_new(void *pass, int call_type){
     gui_save_confirmation();
