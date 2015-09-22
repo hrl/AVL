@@ -125,14 +125,17 @@ int _sns_json_people_formatter(const void *data, void *_pipe){
     result = _sns_json_pipe_init(&_inner_pipe, people_compar);
     if(result != SNS_OP_SUCCESS) return SNS_JSON_ENCODE_FAIL_ERROR;
 
+    // append followings' id to array
     _inner_pipe->father_array = array_followings;
     result = set_map(people->_followings, _inner_pipe, _sns_json_people_circle_formatter);
     if(result != SNS_OP_SUCCESS) return SNS_JSON_ENCODE_FAIL_ERROR;
 
+    // append friends' id to array
     _inner_pipe->father_array = array_friends;
     result = set_map(people->_friends, _inner_pipe, _sns_json_people_circle_formatter);
     if(result != SNS_OP_SUCCESS) return SNS_JSON_ENCODE_FAIL_ERROR;
 
+    // append tags' id to array
     _inner_pipe->father_array = array_tags;
     _inner_pipe->compar = tag_compar;
     result = set_map(people->_tags, _inner_pipe, _sns_json_people_tag_formatter);
@@ -193,9 +196,11 @@ int sns_json_file_write(Sns *self, char *filename){
     if(result != SNS_OP_SUCCESS) return SNS_JSON_ENCODE_FAIL_ERROR;
     _pipe->father_array = array_peoples;
 
+    // append people to array
     result = sns_map_people(self, _pipe, _sns_json_people_formatter);
     if(result != SNS_OP_SUCCESS) return SNS_JSON_ENCODE_FAIL_ERROR;
 
+    // append tag to array
     _pipe->father_array = array_tags;
     _pipe->compar = tag_compar;
     result = sns_map_tag(self, _pipe, _sns_json_tag_formatter);
