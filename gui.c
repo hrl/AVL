@@ -104,6 +104,67 @@ void build_UI() {
     gtk_widget_show_all(GTK_WIDGET(window));
 }
 
+/* Basic function */
+GtkWidget** gui_create_message_dialog(GtkWindow *fwindow, char *messages, GtkMessageType type, GtkWidget **dialog_response){
+    GtkButtonsType buttons = GTK_BUTTONS_OK;
+    switch(type){
+        case GTK_MESSAGE_ERROR: buttons = GTK_BUTTONS_OK; break;
+        case GTK_MESSAGE_WARNING: buttons = GTK_BUTTONS_OK; break;
+        case GTK_MESSAGE_QUESTION: buttons = GTK_BUTTONS_YES_NO; break;
+        case GTK_MESSAGE_INFO:break;
+        case GTK_MESSAGE_OTHER:break;
+    }
+
+    GtkDialogFlags flags = GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT;
+
+    dialog_response[0] = GTK_WIDGET(gtk_message_dialog_new(
+        fwindow,
+        flags,
+        type,
+        buttons,
+        messages
+    ));
+
+    return dialog_response;
+}
+
+GtkWidget** gui_create_edit_dialog(GtkWindow *fwindow, int rws, char argi[][100], GtkWidget **dialog_response){
+    GtkDialogFlags flags = GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT;
+
+    dialog_response[0] = GTK_WIDGET(gtk_dialog_new_with_buttons(
+            argi[0],
+            window,
+            flags,
+            "确定", GTK_RESPONSE_ACCEPT,
+            "取消", GTK_RESPONSE_REJECT,
+            NULL));
+
+    dialog_response[1] = gtk_grid_new();
+    gtk_grid_insert_column(GTK_GRID(dialog_response[1]), 0);
+    gtk_grid_insert_column(GTK_GRID(dialog_response[1]), 1);
+
+    int i;
+    for(i=0; i<rws; i++){
+        gtk_grid_insert_row(GTK_GRID(dialog_response[1]), i);
+    }
+
+    gtk_grid_set_row_spacing(GTK_GRID(dialog_response[1]), 5);
+    gtk_grid_set_column_spacing(GTK_GRID(dialog_response[1]), 5);
+
+    for(i=1; i<=rws; i++){
+        dialog_response[2*i] = gtk_label_new(argi[i]);
+        dialog_response[2*i+1] = gtk_entry_new();
+        gtk_entry_set_text(GTK_ENTRY(dialog_response[2*i+1]), argi[i+rws]);
+        gtk_grid_attach(GTK_GRID(dialog_response[1]), dialog_response[2*i], 0, i, 1, 1);
+        gtk_grid_attach(GTK_GRID(dialog_response[1]), dialog_response[2*i+1], 1, i, 1, 1);
+    }
+
+    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog_response[0]))), dialog_response[1]);
+
+    return dialog_response;
+}
+
+/* Menu function */
 void gui_sns_file_new(void *pass, int call_type){}
 void gui_sns_file_load(void *pass, int call_type){}
 void gui_sns_file_save(void *pass, int call_type){}
