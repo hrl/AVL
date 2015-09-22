@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include "set_functions.h"
 #include "sns_functions.h"
 #include "set_structs.h"
@@ -173,8 +174,11 @@ int _people_common_pipe_del(_People_common_pipe **_pipe){
 int _people_del_refresh_set(const void *data, void *_pipe){
     _People_common_pipe *pipe;
     pipe = (_People_common_pipe*)_pipe;
+    // data: People*
+    //   ->_followings: Set*
     Set *target_set;
-    target_set = (Set*) ((char*)data + pipe->refresh_shift);
+    target_set = *(&(((People*)data)->_followings) + pipe->refresh_shift);
+
     int result;
     result = set_delete(&target_set, pipe->self, pipe->compar);
     if(result != SET_OP_SUCCESS) return PEOPLE_DEL_FAIL_ERROR;
@@ -194,21 +198,22 @@ int people_del(Sns *universal, People **self){
     _people_common_pipe_init(&_pipe, people_compar);
 
     _pipe->self = *self;
+    Set *tmp=(*self)->_followings;
 
     // refresh followers' followings set
     _pipe->refresh_shift = 0;
     set_map((*self)->_followers, _pipe, _people_del_refresh_set);
 
     // refresh followings' followers set
-    _pipe->refresh_shift += sizeof(Set*);
+    _pipe->refresh_shift++;
     set_map((*self)->_followings, _pipe, _people_del_refresh_set);
 
     // refresh incoming friends' friends set
-    _pipe->refresh_shift += sizeof(Set*);
+    _pipe->refresh_shift++;
     set_map((*self)->__incoming_friends, _pipe, _people_del_refresh_set);
 
     // refresh friends' incoming friends set
-    _pipe->refresh_shift += sizeof(Set*);
+    _pipe->refresh_shift++;
     set_map((*self)->_friends, _pipe, _people_del_refresh_set);
 
     // refresh universal set
