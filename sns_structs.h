@@ -8,8 +8,10 @@
 #include "set_structs.h"
 
 struct sns {
-    int id_max;
+    int peoples_id_max;
+    int tags_id_max;
     Set *_peoples;
+    Set *_tags;
 };
 
 struct people {

@@ -30,11 +30,15 @@ int sns_init(Sns **self){
         return SNS_INIT_FAIL_ERROR;
     }
 
-    (*self)->id_max = 0;
+    (*self)->peoples_id_max = 0;
+    (*self)->tags_id_max = 0;
     (*self)->_peoples = NULL;
+    (*self)->_tags = NULL;
 
     int result;
     result = set_init(&((*self)->_peoples));
+    if(result != SET_OP_SUCCESS) return SNS_INIT_FAIL_ERROR;
+    result = set_init(&((*self)->_tags));
     if(result != SET_OP_SUCCESS) return SNS_INIT_FAIL_ERROR;
 
     return SNS_OP_SUCCESS;
@@ -73,12 +77,12 @@ int sns_insert(Sns *self, People *people){
         return PEOPLE_UNINIT_ERROR;
     }
 
-    people->id = self->id_max + 1;
+    people->id = self->peoples_id_max + 1;
 
     int result;
     result = set_insert(&(self->_peoples), people, people_compar);
     if(result != SET_OP_SUCCESS) return SNS_INSERT_FAIL_ERROR;
-    self->id_max++;
+    self->peoples_id_max++;
 
     return SNS_OP_SUCCESS;
 }
