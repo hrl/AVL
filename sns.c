@@ -13,6 +13,10 @@
 #include "set_defines.h"
 #include "sns_defines.h"
 
+int _sns_int_max(int a, int b){
+    return a>b?a:b;
+}
+
 int tag_compar(const void *a, const void *b){
     Tag *A, *B;
     A = (Tag*)a;
@@ -111,7 +115,12 @@ int sns_insert_people(Sns *self, People *people, int id_given){
     int result;
     result = set_insert(&(self->_peoples), people, people_compar);
     if(result != SET_OP_SUCCESS) return SNS_INSERT_FAIL_ERROR;
-    self->peoples_id_max++;
+
+    if(id_given == 1){
+        self->peoples_id_max = _sns_int_max(self->peoples_id_max+1, people->id);
+    } else {
+        self->peoples_id_max++;
+    }
 
     return SNS_OP_SUCCESS;
 }
@@ -132,7 +141,12 @@ int sns_insert_tag(Sns *self, Tag *tag, int id_given){
     int result;
     result = set_insert(&(self->_tags), tag, tag_compar);
     if (result != SET_OP_SUCCESS) return SNS_INSERT_FAIL_ERROR;
-    self->peoples_id_max++;
+
+    if(id_given == 1){
+        self->tags_id_max = _sns_int_max(self->tags_id_max+1, tag->id);
+    } else {
+        self->tags_id_max++;
+    }
 
     return SNS_OP_SUCCESS;
 }
