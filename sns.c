@@ -241,6 +241,20 @@ int people_follow(People *self, People *target){
     return PEOPLE_OP_SUCCESS;
 }
 
+int people_unfollow(People *self, People *target){
+    if(self == NULL || target == NULL){
+        return PEOPLE_UNINIT_ERROR;
+    }
+
+    int result;
+    result = set_delete(&(self->_followings), target, people_compar);
+    if(result != SET_OP_SUCCESS) return PEOPLE_FOLLOW_FAIL_ERROR;
+    result = set_delete(&(target->_followers), self, people_compar);
+    if(result != SET_OP_SUCCESS) return PEOPLE_FOLLOW_FAIL_ERROR;
+
+    return PEOPLE_OP_SUCCESS;
+}
+
 int people_friend(People *self, People *target){
     if(self == NULL || target == NULL){
         return PEOPLE_UNINIT_ERROR;
@@ -250,6 +264,20 @@ int people_friend(People *self, People *target){
     result = set_insert(&(self->_friends), target, people_compar);
     if(result != SET_OP_SUCCESS) return PEOPLE_FRIEND_FAIL_ERROR;
     result = set_insert(&(target->__incoming_friends), self, people_compar);
+    if(result != SET_OP_SUCCESS) return PEOPLE_FRIEND_FAIL_ERROR;
+
+    return PEOPLE_OP_SUCCESS;
+}
+
+int people_unfriend(People *self, People *target){
+    if(self == NULL || target == NULL){
+        return PEOPLE_UNINIT_ERROR;
+    }
+
+    int result;
+    result = set_delete(&(self->_friends), target, people_compar);
+    if(result != SET_OP_SUCCESS) return PEOPLE_FRIEND_FAIL_ERROR;
+    result = set_delete(&(target->__incoming_friends), self, people_compar);
     if(result != SET_OP_SUCCESS) return PEOPLE_FRIEND_FAIL_ERROR;
 
     return PEOPLE_OP_SUCCESS;
