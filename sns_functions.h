@@ -11,7 +11,7 @@ int people_compar(const void *a, const void *b);
 int sns_init(Sns **self);
 int sns_del(Sns **self);
 int sns_search(Sns *self, People *people, People **result_people, int *result_found);
-int sns_insert(Sns *self, People *people);
+int sns_insert_people(Sns *self, People *people);
 int sns_delete(Sns *self, People *people);
 int sns_map(Sns *self, void *pipe, int (*callback)(const void *, void *));
 int people_init(Sns *universal, People **self, char name[100]);

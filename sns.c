@@ -68,7 +68,7 @@ int sns_search(Sns *self, People *people, People **result_people, int *result_fo
     return SNS_OP_SUCCESS;
 }
 
-int sns_insert(Sns *self, People *people){
+int sns_insert_people(Sns *self, People *people){
     if(self == NULL){
         return SNS_UNINIT_ERROR;
     }
@@ -142,7 +142,7 @@ int people_init(Sns *universal, People **self, char name[100]){
         wait_init++;
     }
 
-    result = sns_insert(universal, *self);
+    result = sns_insert_people(universal, *self);
     if(result != SNS_OP_SUCCESS) return PEOPLE_INIT_FAIL_ERROR;
 
     return PEOPLE_OP_SUCCESS;
