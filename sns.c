@@ -217,6 +217,22 @@ int tag_init(Sns *universal, Tag **self, char name[100], int id, int id_given) {
     return TAG_OP_SUCCESS;
 }
 
+int tag_del(Sns *universal, Tag **self){
+    if (universal == NULL) {
+        return SNS_UNINIT_ERROR;
+    }
+
+    if (*self == NULL) {
+        return TAG_OP_SUCCESS;
+    }
+
+    sns_delete_tag(universal, *self);
+    free(*self);
+    *self = NULL;
+
+    return TAG_OP_SUCCESS;
+}
+
 int people_init(Sns *universal, People **self, char name[100], int id, int id_given){
     if(universal == NULL){
         return SNS_UNINIT_ERROR;

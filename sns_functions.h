@@ -17,6 +17,7 @@ int sns_insert_tag(Sns *self, Tag *tag, int id_given);
 int sns_delete_people(Sns *self, People *people);
 int sns_map(Sns *self, void *pipe, int (*callback)(const void *, void *));
 int tag_init(Sns *universal, Tag **self, char name[100], int id, int id_given);
+int tag_del(Sns *universal, Tag **self);
 int people_init(Sns *universal, People **self, char name[100], int id, int id_given);
 int people_del(Sns *universal, People **self);
 int people_follow(People *self, People *target);
