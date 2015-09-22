@@ -197,7 +197,7 @@ void gui_save_confirmation(){
         gtk_widget_show_all(question_dialog[0]);
 
         if(gtk_dialog_run(GTK_DIALOG(question_dialog[0])) == GTK_RESPONSE_YES){
-            gui_sns_file_save(NULL, NULL);
+            gui_sns_file_save((void*)NULL, CALL_TYPE_NORMAL);
         }
         gtk_widget_destroy(GTK_WIDGET(question_dialog[0]));
         free(question_dialog);
