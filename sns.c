@@ -95,7 +95,7 @@ int sns_search_tag(Sns *self, Tag *tag, Tag **result_tag, int *result_found){
     return SNS_OP_SUCCESS;
 }
 
-int sns_insert_people(Sns *self, People *people){
+int sns_insert_people(Sns *self, People *people, int id_given){
     if(self == NULL){
         return SNS_UNINIT_ERROR;
     }
@@ -104,7 +104,9 @@ int sns_insert_people(Sns *self, People *people){
         return PEOPLE_UNINIT_ERROR;
     }
 
-    people->id = self->peoples_id_max + 1;
+    if(id_given == 0){
+        people->id = self->peoples_id_max + 1;
+    }
 
     int result;
     result = set_insert(&(self->_peoples), people, people_compar);
@@ -172,7 +174,7 @@ int sns_map(Sns *self, void *pipe, int (*callback)(const void *, void *)){
     return SNS_OP_SUCCESS;
 }
 
-int people_init(Sns *universal, People **self, char name[100]){
+int people_init(Sns *universal, People **self, char name[100], int id, int id_given){
     if(universal == NULL){
         return SNS_UNINIT_ERROR;
     }
@@ -186,7 +188,11 @@ int people_init(Sns *universal, People **self, char name[100]){
         return PEOPLE_INIT_FAIL_ERROR;
     }
 
-    (*self)->id = 0;
+    if(id_given == 1){
+        (*self)->id = id;
+    } else {
+        (*self)->id = 0;
+    }
     strcpy((*self)->name, name);
 
     Set **wait_init=&((*self)->_followings);
@@ -204,7 +210,7 @@ int people_init(Sns *universal, People **self, char name[100]){
         wait_init++;
     }
 
-    result = sns_insert_people(universal, *self);
+    result = sns_insert_people(universal, *self, id_given);
     if(result != SNS_OP_SUCCESS) return PEOPLE_INIT_FAIL_ERROR;
 
     return PEOPLE_OP_SUCCESS;
