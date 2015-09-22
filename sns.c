@@ -61,7 +61,6 @@ int sns_json_file_read(Sns **self, char *filename){
     return SNS_OP_SUCCESS;
 }
 
-
 int sns_json_file_load(Sns **self, cJSON *data){
     if(*self != NULL){
         return SNS_INITED_ERROR;
