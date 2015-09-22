@@ -13,6 +13,13 @@
 #include "set_defines.h"
 #include "sns_defines.h"
 
+int tag_compar(const void *a, const void *b){
+    Tag *A, *B;
+    A = (Tag*)a;
+    B = (Tag*)b;
+    return A->id - B->id;
+}
+
 int people_compar(const void *a, const void *b){
     People *A, *B;
     A = (People*)a;
@@ -82,6 +89,25 @@ int sns_insert_people(Sns *self, People *people){
     int result;
     result = set_insert(&(self->_peoples), people, people_compar);
     if(result != SET_OP_SUCCESS) return SNS_INSERT_FAIL_ERROR;
+    self->peoples_id_max++;
+
+    return SNS_OP_SUCCESS;
+}
+
+int sns_insert_tag(Sns *self, Tag *tag) {
+    if (self == NULL) {
+        return SNS_UNINIT_ERROR;
+    }
+
+    if (tag == NULL) {
+        return TAG_UNINIT_ERROR;
+    }
+
+    tag->id = self->tags_id_max + 1;
+
+    int result;
+    result = set_insert(&(self->_tags), tag, tag_compar);
+    if (result != SET_OP_SUCCESS) return SNS_INSERT_FAIL_ERROR;
     self->peoples_id_max++;
 
     return SNS_OP_SUCCESS;
