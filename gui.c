@@ -127,5 +127,18 @@ void gui_sns_people_delete(void *pass, int call_type){}
 void gui_sns_tag_new(void *pass, int call_type){}
 void gui_sns_tag_all(void *pass, int call_type){}
 void gui_sns_tag_delete(void *pass, int call_type){}
-void gui_other_about(void *pass, int call_type){}
+
+void gui_other_about(void *pass, int call_type){
+    GtkWidget *about_window = NULL;
+    about_window = gtk_about_dialog_new();
+    gtk_about_dialog_set_program_name(GTK_ABOUT_DIALOG(about_window), program_name);
+    gtk_about_dialog_set_version(GTK_ABOUT_DIALOG(about_window), version);
+    gtk_about_dialog_set_comments(GTK_ABOUT_DIALOG(about_window), comments);
+    gtk_about_dialog_set_website(GTK_ABOUT_DIALOG(about_window), website);
+    gtk_about_dialog_set_website_label(GTK_ABOUT_DIALOG(about_window), website_lable);
+    gtk_about_dialog_set_authors (GTK_ABOUT_DIALOG(about_window), author);
+    gtk_about_dialog_set_logo(GTK_ABOUT_DIALOG(about_window), NULL);
+    gtk_about_dialog_set_license_type(GTK_ABOUT_DIALOG(about_window), GTK_LICENSE_MIT_X11);
+    gtk_widget_show_all(about_window);
+}
 void gui_other_quit(void *pass, int call_type){}
