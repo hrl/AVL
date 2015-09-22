@@ -522,13 +522,13 @@ void gui_sns_people_followings(void *pass, int call_type){
         /* check */
         gtk_tree_model_get(model, &iter, 0, &self, -1);
         gtk_tree_model_get(model, &iter, 1, &type, -1);
-        if(self == NULL || type != TYPE_PEOPLE) return gui_show_message("请先选择用户", GTK_MESSAGE_WARNING);
+        if(self == NULL || type != TYPE_PEOPLE) return gui_show_message("请先选择用户", GTK_MESSAGE_INFO);
 
         last_func = gui_sns_people_followings;
         _gui_clean_column();
         _gui_sns_people_common_show(((People*)self)->_followings);
     } else {
-        gui_show_message("请先选择用户", GTK_MESSAGE_WARNING);
+        gui_show_message("请先选择用户", GTK_MESSAGE_INFO);
     }
 
 }
@@ -546,11 +546,13 @@ void gui_sns_people_delete(void *pass, int call_type){
     GtkTreeIter iter;
     GtkTreeModel *model;
     gpointer *self;
+    gint type;
 
     if(gtk_tree_selection_get_selected(selection, &model, &iter)){
         /* check */
         gtk_tree_model_get(model, &iter, 0, &self, -1);
-        if(self == NULL) return;
+        gtk_tree_model_get(model, &iter, 1, &type, -1);
+        if(self == NULL || type != TYPE_PEOPLE) return gui_show_message("请先选择用户", GTK_MESSAGE_INFO);
 
         GtkWidget **question_dialog = (GtkWidget **)malloc(sizeof(GtkWidget *)*(1));
         question_dialog = gui_create_message_dialog(window, "确定要删除吗?", GTK_MESSAGE_QUESTION, question_dialog);
@@ -565,6 +567,8 @@ void gui_sns_people_delete(void *pass, int call_type){
         }
         gtk_widget_destroy(GTK_WIDGET(question_dialog[0]));
         free(question_dialog);
+    } else {
+        return gui_show_message("请先选择用户", GTK_MESSAGE_INFO);
     }
 
     _gui_call_last_func();
