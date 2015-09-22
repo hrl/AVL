@@ -178,6 +178,12 @@ void gui_save_confirmation(){
     }
 }
 
+void gui_close_file(){
+    if(sns_file != NULL){
+        fclose(sns_file);
+        sns_file = NULL;
+    }
+}
 
 /* Menu function */
 void gui_sns_file_new(void *pass, int call_type){}
@@ -219,5 +225,6 @@ void gui_other_about(void *pass, int call_type){
 }
 void gui_other_quit(void *pass, int call_type){
     gui_save_confirmation();
+    gui_close_file();
     gtk_main_quit();
 }
