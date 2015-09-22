@@ -183,7 +183,7 @@ int sns_delete_tag(Sns *self, Tag *tag) {
     return SNS_OP_SUCCESS;
 }
 
-int sns_map(Sns *self, void *pipe, int (*callback)(const void *, void *)){
+int sns_map_people(Sns *self, void *pipe, int (*callback)(const void *, void *)){
     int result;
     result = set_map(self->_peoples, pipe, callback);
     if(result != SET_OP_SUCCESS)return result;

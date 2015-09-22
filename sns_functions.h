@@ -20,7 +20,7 @@ int sns_insert_people(Sns *self, People *people, int id_given);
 int sns_insert_tag(Sns *self, Tag *tag, int id_given);
 int sns_delete_people(Sns *self, People *people);
 int sns_delete_tag(Sns *self, Tag *tag);
-int sns_map(Sns *self, void *pipe, int (*callback)(const void *, void *));
+int sns_map_people(Sns *self, void *pipe, int (*callback)(const void *, void *));
 
 // tag
 int tag_init(Sns *universal, Tag **self, char name[100], int id, int id_given);
