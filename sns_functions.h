@@ -29,6 +29,7 @@ int people_untag(People *self, Tag *target);
 int people_followings(People *self, Set **followings);
 int people_followers(People *self, Set **followers);
 int people_friends(People *self, Set **friends);
+int people_tags(People *self, Set **tags);
 int people_is_following(People *self, People *target, int *is_following);
 int people_is_follower(People *self, People *target, int *is_follower);
 int people_is_friend(People *self, People *target, int *is_friend);

@@ -495,6 +495,20 @@ int people_friends(People *self, Set **friends){
     return PEOPLE_OP_SUCCESS;
 }
 
+int people_tags(People *self, Set **tags){
+    if(self == NULL){
+        return PEOPLE_UNINIT_ERROR;
+    }
+    if(*tags != NULL){
+        return SET_INITED_ERROR;
+    }
+
+    // tmp handle
+    *tags = self->_tags;
+
+    return PEOPLE_OP_SUCCESS;
+}
+
 int people_is_following(People *self, People *target, int *is_following){
     if(self == NULL || target == NULL){
         return PEOPLE_UNINIT_ERROR;
