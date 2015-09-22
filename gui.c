@@ -511,7 +511,7 @@ void gui_sns_people_unfollow(void *pass, int call_type){}
 void gui_sns_people_unfriend(void *pass, int call_type){}
 void gui_sns_people_untag(void *pass, int call_type){}
 
-void gui_sns_people_followings(void *pass, int call_type){
+void _gui_sns_people_get_selection(People **people){
     GtkTreeSelection *selection = gtk_tree_view_get_selection(treeview);
     GtkTreeIter iter;
     GtkTreeModel *model;
@@ -524,13 +524,20 @@ void gui_sns_people_followings(void *pass, int call_type){
         gtk_tree_model_get(model, &iter, 1, &type, -1);
         if(self == NULL || type != TYPE_PEOPLE) return gui_show_message("请先选择用户", GTK_MESSAGE_INFO);
 
-        last_func = gui_sns_people_followings;
-        _gui_clean_column();
-        _gui_sns_people_common_show(((People*)self)->_followings);
+        *people = (People*)self;
     } else {
         gui_show_message("请先选择用户", GTK_MESSAGE_INFO);
     }
+}
 
+void gui_sns_people_followings(void *pass, int call_type){
+    People *people=NULL;
+    _gui_sns_people_get_selection(&people);
+    if(people != NULL){
+        last_func = gui_sns_people_followings;
+        _gui_clean_column();
+        _gui_sns_people_common_show(people->_followings);
+    }
 }
 
 void gui_sns_people_followers(void *pass, int call_type){}
