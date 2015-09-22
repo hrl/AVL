@@ -110,6 +110,18 @@ void clean_var(){
     SNS = NULL;
 }
 
+void clean_column(){
+    int columns;
+    GtkTreeViewColumn *column;
+    columns = gtk_tree_view_get_n_columns(treeview);
+
+    while(columns){
+        column = gtk_tree_view_get_column(treeview, 0);
+        gtk_tree_view_remove_column(treeview, column);
+        columns--;
+    }
+}
+
 GtkWidget** gui_create_message_dialog(GtkWindow *fwindow, char *messages, GtkMessageType type, GtkWidget **dialog_response){
     GtkButtonsType buttons = GTK_BUTTONS_OK;
     switch(type){
