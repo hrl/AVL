@@ -480,10 +480,7 @@ int _gui_sns_people_insert_into_column(const void *data, void *_pipe){
     return GUI_OP_SUCCESS;
 }
 
-void gui_sns_people_all(void *pass, int call_type){
-    last_func = gui_sns_people_all;
-    _gui_clean_column();
-
+void _gui_sns_people_common_show(Set *people_set){
     GtkListStore *liststore=NULL;
     _gui_create_list_store(&liststore, PEOPLE_ALL);
 
@@ -491,13 +488,20 @@ void gui_sns_people_all(void *pass, int call_type){
     _gui_sns_people_pipe_init(&_pipe);
     _pipe->liststore = &liststore;
 
-    Set *result_set=SNS->_peoples;
     int result;
-    result = set_map(result_set, _pipe, _gui_sns_people_insert_into_column);
+    result = set_map(people_set, _pipe, _gui_sns_people_insert_into_column);
     if(result != GUI_OP_SUCCESS) gui_show_message("查询失败", GTK_MESSAGE_WARNING);
 
     gtk_tree_view_set_model(treeview, GTK_TREE_MODEL(liststore));
     _gui_create_column(PEOPLE_ALL);
+
+    _gui_sns_people_pipe_del(&_pipe);
+}
+
+void gui_sns_people_all(void *pass, int call_type){
+    last_func = gui_sns_people_all;
+    _gui_clean_column();
+    _gui_sns_people_common_show(SNS->_peoples);
 }
 
 void gui_sns_people_follow(void *pass, int call_type){}
