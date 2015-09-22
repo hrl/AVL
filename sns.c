@@ -81,7 +81,7 @@ int sns_search_tag(Sns *self, Tag *tag, Tag **result_tag, int *result_found){
     }
 
     int result;
-    result = set_search(self->_tags, tag, (void **)result_tag, result_found, people_compar);
+    result = set_search(self->_tags, tag, (void **)result_tag, result_found, tag_compar);
     if(result != SET_OP_SUCCESS) return SNS_SEARCH_ERROR;
 
     return SNS_OP_SUCCESS;
