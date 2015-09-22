@@ -510,7 +510,29 @@ void gui_sns_people_tag(void *pass, int call_type){}
 void gui_sns_people_unfollow(void *pass, int call_type){}
 void gui_sns_people_unfriend(void *pass, int call_type){}
 void gui_sns_people_untag(void *pass, int call_type){}
-void gui_sns_people_followings(void *pass, int call_type){}
+
+void gui_sns_people_followings(void *pass, int call_type){
+    GtkTreeSelection *selection = gtk_tree_view_get_selection(treeview);
+    GtkTreeIter iter;
+    GtkTreeModel *model;
+    gpointer *self;
+    gint type;
+
+    if(gtk_tree_selection_get_selected(selection, &model, &iter)) {
+        /* check */
+        gtk_tree_model_get(model, &iter, 0, &self, -1);
+        gtk_tree_model_get(model, &iter, 1, &type, -1);
+        if(self == NULL || type != TYPE_PEOPLE) return gui_show_message("请先选择用户", GTK_MESSAGE_WARNING);
+
+        last_func = gui_sns_people_followings;
+        _gui_clean_column();
+        _gui_sns_people_common_show(((People*)self)->_followings);
+    } else {
+        gui_show_message("请先选择用户", GTK_MESSAGE_WARNING);
+    }
+
+}
+
 void gui_sns_people_followers(void *pass, int call_type){}
 void gui_sns_people_friends(void *pass, int call_type){}
 void gui_sns_people_tags(void *pass, int call_type){}
