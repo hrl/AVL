@@ -589,6 +589,20 @@ int people_common_followers(People *self, People *target, Set **common_followers
     return PEOPLE_OP_SUCCESS;
 }
 
+int people_common_tags(People *self, People *target, Set **common_tags){
+    if(self == NULL || target == NULL){
+        return PEOPLE_UNINIT_ERROR;
+    }
+    if(*common_tags != NULL){
+        return SET_INITED_ERROR;
+    }
+
+    int result;
+    result = set_intersection(self->_tags, target->_tags, common_tags, tag_compar);
+    if(result != SET_OP_SUCCESS) return PEOPLE_CIRCLE_FAIL_ERROR;
+    return PEOPLE_OP_SUCCESS;
+}
+
 int _people_extend_friends(const void *data, void *_pipe){
     _People_common_pipe *pipe=NULL;
     pipe = (_People_common_pipe*)_pipe;
