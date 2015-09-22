@@ -223,6 +223,7 @@ void gui_other_about(void *pass, int call_type){
     gtk_about_dialog_set_license_type(GTK_ABOUT_DIALOG(about_window), GTK_LICENSE_MIT_X11);
     gtk_widget_show_all(about_window);
 }
+
 void gui_other_quit(void *pass, int call_type){
     gui_save_confirmation();
     gui_close_file();
