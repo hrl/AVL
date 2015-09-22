@@ -453,7 +453,6 @@ int people_untag(People *self, Tag *target){
     return PEOPLE_OP_SUCCESS;
 }
 
-
 int people_followings(People *self, Set **followings){
     if(self == NULL){
         return PEOPLE_UNINIT_ERROR;
