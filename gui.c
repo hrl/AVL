@@ -550,7 +550,16 @@ void gui_sns_people_followers(void *pass, int call_type){
     }
 }
 
-void gui_sns_people_friends(void *pass, int call_type){}
+void gui_sns_people_friends(void *pass, int call_type){
+    People *people=NULL;
+    _gui_sns_people_get_selection(&people);
+    if(people != NULL){
+        last_func = gui_sns_people_friends;
+        _gui_clean_column();
+        _gui_sns_people_common_show(people->_friends);
+    }
+}
+
 void gui_sns_people_tags(void *pass, int call_type){}
 void gui_sns_people_c_followings(void *pass, int call_type){}
 void gui_sns_people_c_followers(void *pass, int call_type){}
