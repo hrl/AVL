@@ -190,6 +190,33 @@ int sns_map(Sns *self, void *pipe, int (*callback)(const void *, void *)){
     return SNS_OP_SUCCESS;
 }
 
+int tag_init(Sns *universal, Tag **self, char name[100], int id, int id_given) {
+    if (universal == NULL) {
+        return SNS_UNINIT_ERROR;
+    }
+
+    if (*self != NULL) {
+        return PEOPLE_INITED_ERROR;
+    }
+
+    *self = (Tag*)malloc(sizeof(Tag));
+    if (*self == NULL) {
+        return PEOPLE_INIT_FAIL_ERROR;
+    }
+
+    if (id_given == 1) {
+        (*self)->id = id;
+    } else {
+        (*self)->id = 0;
+    }
+    strcpy((*self)->name, name);
+    int result;
+    result = sns_insert_tag(universal, *self, id_given);
+    if(result != SNS_OP_SUCCESS) return PEOPLE_INIT_FAIL_ERROR;
+
+    return TAG_OP_SUCCESS;
+}
+
 int people_init(Sns *universal, People **self, char name[100], int id, int id_given){
     if(universal == NULL){
         return SNS_UNINIT_ERROR;
