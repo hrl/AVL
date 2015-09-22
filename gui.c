@@ -105,12 +105,12 @@ void build_UI() {
 }
 
 /* Basic function */
-void clean_var(){
+void gui_clean_var(){
     sns_del(&SNS);
     SNS = NULL;
 }
 
-void clean_column(){
+void gui_clean_column(){
     int columns;
     GtkTreeViewColumn *column;
     columns = gtk_tree_view_get_n_columns(treeview);
@@ -203,7 +203,14 @@ void gui_close_file(){
 }
 
 /* Menu function */
-void gui_sns_file_new(void *pass, int call_type){}
+void gui_sns_file_new(void *pass, int call_type){
+    gui_save_confirmation();
+    gui_close_file();
+    gui_clean_var();
+    gui_clean_column();
+    sns_changed = 0;
+}
+
 void gui_sns_file_load(void *pass, int call_type){}
 void gui_sns_file_save(void *pass, int call_type){}
 void gui_sns_people_new(void *pass, int call_type){}
