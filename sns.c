@@ -432,7 +432,7 @@ int people_tag(People *self, Tag *target){
 
     int result;
     result = set_insert(&(self->_tags), target, tag_compar);
-    if(result != SET_OP_SUCCESS) return PEOPLE_FRIEND_FAIL_ERROR;
+    if(result != SET_OP_SUCCESS) return PEOPLE_TAG_FAIL_ERROR;
 
     return PEOPLE_OP_SUCCESS;
 }
