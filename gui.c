@@ -758,7 +758,12 @@ void gui_sns_people_friends(void *pass, int call_type){
     }
 }
 
-void gui_sns_people_tags(void *pass, int call_type){}
+void gui_sns_people_tags(void *pass, int call_type){
+    last_func = gui_sns_people_tags;
+    _gui_clean_column();
+    _gui_sns_tag_common_show(SNS->_tags);
+}
+
 void gui_sns_people_c_followings(void *pass, int call_type){}
 void gui_sns_people_c_followers(void *pass, int call_type){}
 void gui_sns_people_e_friends(void *pass, int call_type){}
