@@ -5,7 +5,7 @@
 #ifndef AVL_GUI_DEFINES_H
 #define AVL_GUI_DEFINES_H
 
-#define UI_FILE "UI.xml"
+// tmp
 #define UI_FILE "/home/hrl/ClionProjects/AVL/UI.xml"
 
 const char *version = "0.1";

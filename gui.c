@@ -105,6 +105,12 @@ void build_UI() {
 }
 
 /* Basic function */
+void _gui_call_last_func(){
+    if(last_func != NULL){
+        (*last_func)(NULL, CALL_TYPE_REDO);
+    }
+}
+
 void gui_clean_var(){
     sns_del(&SNS);
     SNS = NULL;
@@ -281,14 +287,14 @@ void _gui_append_column(char column_title[][20], int column_line[], int cls){
 void _gui_create_column(int type){
     switch(type){
         case PEOPLE_ALL:{
-            char column_title[2][20] = {"ID", "昵称"};
+            char column_title[2][20] = {"ID", "用户名"};
             int column_line[2] = {PEOPLE_ALL_ID, PEOPLE_ALL_NAME};
             int cls=2;
             _gui_append_column(column_title, column_line, cls);
             break;
         }
         case TAG_ALL:{
-            char column_title[2][20] = {"ID", "名称"};
+            char column_title[2][20] = {"ID", "爱好名"};
             int column_line[2] = {TAG_ALL_ID, TAG_ALL_NAME};
             int cls=2;
             _gui_append_column(column_title, column_line, cls);
@@ -371,7 +377,70 @@ void gui_sns_file_save(void *pass, int call_type){
     }
 }
 
-void gui_sns_people_new(void *pass, int call_type){}
+int _gui_sns_people_dialog(void *self){
+    People **people=(People**)self;
+    int rws=1;
+    char title[100];
+    char argi[rws*2+1][100];
+
+    if(people == NULL){
+        strcpy(title, "新建用户");
+        strcpy(argi[rws+1], "");
+    } else {
+        strcpy(title, "编辑用户");
+        strcpy(argi[rws+1], (*people)->name);
+    }
+    strcpy(argi[0], title);
+    strcpy(argi[1], "用户名");
+
+    GtkWidget **dialog_result = (GtkWidget **)malloc(sizeof(GtkWidget *)*(rws*2+2));
+    dialog_result = gui_create_edit_dialog(window, rws, argi, dialog_result);
+    gtk_widget_show_all(dialog_result[0]);
+
+    char validate_message[100];
+    validate_message[0] = '\0';
+    int result;
+    GtkEntryBuffer *buffer;
+    char name[100];
+    while(gtk_dialog_run(GTK_DIALOG(dialog_result[0])) == GTK_RESPONSE_ACCEPT){
+        validate_message[0] = '\0';
+
+        buffer = gtk_entry_get_buffer(GTK_ENTRY(dialog_result[2*1+1]));
+        if(gtk_entry_buffer_get_length(buffer) >= 100){
+            strcpy(validate_message, "用户名过长");
+        } else {
+            strcpy(name, gtk_entry_buffer_get_text(buffer));
+        }
+
+        if(validate_message[0] != '\0'){
+            gui_show_message(validate_message, GTK_MESSAGE_WARNING);
+            continue;
+        }
+
+        if(people == NULL){
+            People *_people_tmp=NULL;
+            people = &_people_tmp;
+            result = people_init(SNS, people, name, 0, 0);
+        } else {
+            strcpy((*people)->name, name);
+            result = PEOPLE_OP_SUCCESS;
+        }
+        break;
+    }
+
+    gtk_widget_destroy(GTK_WIDGET(dialog_result[0]));
+    free(dialog_result);
+
+    return result;
+}
+
+void gui_sns_people_new(void *pass, int call_type){
+    if(_gui_sns_people_dialog(NULL) == PEOPLE_OP_SUCCESS){
+        sns_changed = 1;
+        _gui_call_last_func();
+    }
+}
+
 void gui_sns_people_all(void *pass, int call_type){}
 void gui_sns_people_follow(void *pass, int call_type){}
 void gui_sns_people_friend(void *pass, int call_type){}
