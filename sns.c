@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <cJSON.h>
 #include "set_functions.h"
 #include "sns_functions.h"
 #include "set_structs.h"
@@ -29,6 +30,183 @@ int people_compar(const void *a, const void *b){
     A = (People*)a;
     B = (People*)b;
     return A->id - B->id;
+}
+
+int sns_json_file_read(char* filename, cJSON **result){
+    FILE *file=NULL;
+    file = fopen(filename, "rb");
+    if(file == NULL){
+        return SNS_IO_FAIL_ERROR;
+    }
+
+    fseek(file, 0, SEEK_END);
+    long len = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    char *data=(char*)malloc(sizeof(char)*len+1);
+    fread(data, 1, len, file);
+    fclose(file);
+
+    *result = cJSON_Parse(data);
+    free(data);
+
+    if(*result == NULL){
+        return SNS_JSON_DECODE_FAIL_ERROR;
+    }
+
+    return SNS_OP_SUCCESS;
+}
+
+int sns_json_file_load(Sns **self, cJSON *data){
+    return SNS_OP_SUCCESS;
+}
+
+struct _sns_json_pipe {
+    cJSON *father_array;
+    cJSON *father_object;
+    int (*compar)(const void *, const void *);
+};
+typedef struct _sns_json_pipe _Sns_json_pipe;
+
+int _sns_json_pipe_init(_Sns_json_pipe **_pipe, int (*compar)(const void *, const void *)){
+    *_pipe = (_Sns_json_pipe*)malloc(sizeof(_Sns_json_pipe));
+    (*_pipe)->father_array = NULL;
+    (*_pipe)->father_object = NULL;
+    (*_pipe)->compar = compar;
+    return SNS_OP_SUCCESS;
+}
+
+int _sns_json_pipe_del(_Sns_json_pipe **_pipe){
+    if(*_pipe == NULL){
+        return SNS_OP_SUCCESS;
+    }
+    free(*_pipe);
+    *_pipe = NULL;
+    return SNS_OP_SUCCESS;
+}
+
+int _sns_json_people_circle_formatter(const void *data, void *_pipe){
+    _Sns_json_pipe *pipe=NULL;
+    pipe = (_Sns_json_pipe*)_pipe;
+    People *people=NULL;
+    people = (People*)data;
+
+    cJSON_AddItemToArray(pipe->father_array, cJSON_CreateNumber(people->id));
+    return SNS_OP_SUCCESS;
+}
+
+int _sns_json_people_tag_formatter(const void *data, void *_pipe){
+    _Sns_json_pipe *pipe=NULL;
+    pipe = (_Sns_json_pipe*)_pipe;
+    Tag *tag=NULL;
+    tag = (Tag*)data;
+
+    cJSON_AddItemToArray(pipe->father_array, cJSON_CreateNumber(tag->id));
+    return SNS_OP_SUCCESS;
+}
+
+int _sns_json_people_formatter(const void *data, void *_pipe){
+    _Sns_json_pipe *pipe=NULL;
+    pipe = (_Sns_json_pipe*)_pipe;
+    People *people=NULL;
+    people = (People*)data;
+
+    cJSON *root=NULL;
+    cJSON *array_followings=NULL;
+    cJSON *array_friends=NULL;
+    cJSON *array_tags=NULL;
+    root = cJSON_CreateObject();
+    array_followings = cJSON_CreateArray();
+    array_friends= cJSON_CreateArray();
+    array_tags= cJSON_CreateArray();
+
+
+    int result;
+    _Sns_json_pipe *_inner_pipe=NULL;
+    result = _sns_json_pipe_init(&_inner_pipe, people_compar);
+    if(result != SNS_OP_SUCCESS) return SNS_JSON_ENCODE_FAIL_ERROR;
+
+    _inner_pipe->father_array = array_followings;
+    result = set_map(people->_followings, _inner_pipe, _sns_json_people_circle_formatter);
+    if(result != SNS_OP_SUCCESS) return SNS_JSON_ENCODE_FAIL_ERROR;
+
+    _inner_pipe->father_array = array_friends;
+    result = set_map(people->_friends, _inner_pipe, _sns_json_people_circle_formatter);
+    if(result != SNS_OP_SUCCESS) return SNS_JSON_ENCODE_FAIL_ERROR;
+
+    _inner_pipe->father_array = array_tags;
+    _inner_pipe->compar = tag_compar;
+    result = set_map(people->_tags, _inner_pipe, _sns_json_people_tag_formatter);
+    if(result != SNS_OP_SUCCESS) return SNS_JSON_ENCODE_FAIL_ERROR;
+
+    cJSON_AddNumberToObject(root, "id", people->id);
+    cJSON_AddStringToObject(root, "name", people->name);
+    cJSON_AddItemToObject(root, "followings", array_followings);
+    cJSON_AddItemToObject(root, "friends", array_friends);
+    cJSON_AddItemToObject(root, "tags", array_tags);
+
+    cJSON_AddItemToArray(pipe->father_array, root);
+
+    return SNS_OP_SUCCESS;
+}
+
+int _sns_json_tag_formatter(const void *data, void *_pipe) {
+    _Sns_json_pipe *pipe = NULL;
+    pipe = (_Sns_json_pipe*)_pipe;
+    Tag *tag = NULL;
+    tag = (Tag*)data;
+
+    cJSON *root=NULL;
+    root = cJSON_CreateObject();
+
+    cJSON_AddNumberToObject(root, "id", tag->id);
+    cJSON_AddStringToObject(root, "name", tag->name);
+
+    cJSON_AddItemToArray(pipe->father_array, root);
+
+    return SNS_OP_SUCCESS;
+}
+
+int sns_json_file_write(Sns *self, char *filename){
+    if(self == NULL){
+        return SNS_UNINIT_ERROR;
+    }
+
+    FILE *file=NULL;
+    file = fopen(filename, "wb");
+    if(file == NULL){
+        return SNS_IO_FAIL_ERROR;
+    }
+
+    cJSON *root=NULL;
+    cJSON *array_peoples=NULL;
+    cJSON *array_tags=NULL;
+
+    root = cJSON_CreateObject();
+    array_peoples = cJSON_CreateArray();
+    array_tags = cJSON_CreateArray();
+    cJSON_AddItemToObject(root, "peoples", array_peoples);
+    cJSON_AddItemToObject(root, "tags", array_tags);
+
+    int result;
+    _Sns_json_pipe *_pipe;
+    result = _sns_json_pipe_init(&_pipe, people_compar);
+    if(result != SNS_OP_SUCCESS) return SNS_JSON_ENCODE_FAIL_ERROR;
+    _pipe->father_array = array_peoples;
+
+    result = sns_map_people(self, _pipe, _sns_json_people_formatter);
+    if(result != SNS_OP_SUCCESS) return SNS_JSON_ENCODE_FAIL_ERROR;
+
+    _pipe->father_array = array_tags;
+    _pipe->compar = tag_compar;
+    result = sns_map_tag(self, _pipe, _sns_json_tag_formatter);
+    if(result != SNS_OP_SUCCESS) return SNS_JSON_ENCODE_FAIL_ERROR;
+
+    char *out=cJSON_Print(root);
+    fputs(out, file);
+    fclose(file);
+    cJSON_Delete(root);
+
+    return SNS_OP_SUCCESS;
 }
 
 int sns_init(Sns **self){

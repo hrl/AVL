@@ -309,7 +309,7 @@ int avl_post_order_traversal(Tree *self, void *pipe, int (*callback)(const void 
 
 int avl_level_order_traversal(Tree *self, void *pipe, int (*callback)(const void *, void *)){
     if(self == NULL){
-        return TREE_UNINIT_ERROR;
+        return TREE_OP_SUCCESS;
     }
 
     int result=TREE_OP_SUCCESS;

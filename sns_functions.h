@@ -5,6 +5,7 @@
 #ifndef AVL_SNS_FUNCTIONS_H
 #define AVL_SNS_FUNCTIONS_H
 
+#include <cJSON.h>
 #include "sns_structs.h"
 
 // compar
@@ -12,6 +13,9 @@ int tag_compar(const void *a, const void *b);
 int people_compar(const void *a, const void *b);
 
 // sns
+int sns_json_file_read(char *filename, cJSON **result);
+int sns_json_file_load(Sns **self, cJSON *data);
+int sns_json_file_write(Sns *self, char *filename);
 int sns_init(Sns **self);
 int sns_del(Sns **self);
 int sns_search_people(Sns *self, People *people, People **result_people, int *result_found);
