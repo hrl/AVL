@@ -204,6 +204,63 @@ void gui_save_confirmation(){
     }
 }
 
+void _gui_create_list_store(GtkListStore **liststore, int type){
+    switch(type){
+        case PEOPLE_ALL:{
+            *liststore = gtk_list_store_new(
+                PEOPLE_ALL_COLUMNS,
+                G_TYPE_POINTER,
+                G_TYPE_INT,
+                G_TYPE_INT,   // PEOPLE_ALL_ID
+                G_TYPE_STRING // PEOPLE_ALL_NAME
+            );
+            break;
+        }
+        case TAG_ALL:{
+            *liststore = gtk_list_store_new(
+                TAG_ALL_COLUMNS,
+                G_TYPE_POINTER,
+                G_TYPE_INT,
+                G_TYPE_INT,   // TAG_ALL_ID
+                G_TYPE_STRING // TAG_ALL_NAME
+            );
+            break;
+        }
+    };
+}
+
+void _gui_insert_into_list_store(GtkListStore **liststore, void *data, int type){
+    GtkTreeIter iterator;
+    switch(type){
+        case PEOPLE_ALL:{
+            People **people_iterator=(People**)data;
+            gtk_list_store_append(*liststore, &iterator);
+            gtk_list_store_set(
+                *liststore, &iterator,
+                PEOPLE_ALL_POINTER, people_iterator,
+                PEOPLE_ALL_TYPE, TYPE_PEOPLE,
+                PEOPLE_ALL_ID, (*people_iterator)->id,
+                PEOPLE_ALL_NAME, (*people_iterator)->name,
+                -1
+            );
+            break;
+        }
+        case TAG_ALL:{
+            Tag **tag_iterator=(Tag**)data;
+            gtk_list_store_append(*liststore, &iterator);
+            gtk_list_store_set(
+                *liststore, &iterator,
+                TAG_ALL_POINTER, tag_iterator,
+                TAG_ALL_TYPE, TYPE_TAG,
+                TAG_ALL_ID, (*tag_iterator)->id,
+                TAG_ALL_NAME, (*tag_iterator)->name,
+                -1
+            );
+            break;
+        }
+    };
+}
+
 /* Menu function */
 void gui_sns_file_new(void *pass, int call_type){
     gui_save_confirmation();
