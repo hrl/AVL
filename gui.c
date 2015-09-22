@@ -256,7 +256,7 @@ void gui_sns_file_load(void *pass, int call_type){
     }
 }
 
-void gui_sns_file_save_as(void *pass, int call_type){
+void _gui_sns_file_save_as(void *pass, int call_type){
     sns_filename=_gui_file_choose(FILE_CHOOSE_SAVE);
     if(sns_filename != NULL){
         int result;
@@ -269,7 +269,7 @@ void gui_sns_file_save_as(void *pass, int call_type){
 
 void gui_sns_file_save(void *pass, int call_type){
     if(sns_filename == NULL){
-        return gui_sns_file_save_as(pass, call_type);
+        return _gui_sns_file_save_as(pass, call_type);
     }
     int result;
     result = sns_json_file_write(SNS, sns_filename);
