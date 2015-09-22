@@ -421,6 +421,22 @@ int people_unfriend(People *self, People *target){
     return PEOPLE_OP_SUCCESS;
 }
 
+int people_tag(People *self, Tag *target){
+    if(self == NULL){
+        return PEOPLE_UNINIT_ERROR;
+    }
+
+    if(target == NULL){
+        return TAG_UNINIT_ERROR;
+    }
+
+    int result;
+    result = set_insert(&(self->_tags), target, tag_compar);
+    if(result != SET_OP_SUCCESS) return PEOPLE_FRIEND_FAIL_ERROR;
+
+    return PEOPLE_OP_SUCCESS;
+}
+
 int people_followings(People *self, Set **followings){
     if(self == NULL){
         return PEOPLE_UNINIT_ERROR;
