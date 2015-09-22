@@ -164,6 +164,21 @@ GtkWidget** gui_create_edit_dialog(GtkWindow *fwindow, int rws, char argi[][100]
     return dialog_response;
 }
 
+void gui_save_confirmation(){
+    if(!sns_updated){
+        GtkWidget **question_dialog = (GtkWidget **)malloc(sizeof(GtkWidget *)*(1));
+        question_dialog = gui_create_message_dialog(window, "更改尚未保存，要保存吗?", GTK_MESSAGE_QUESTION, question_dialog);
+        gtk_widget_show_all(question_dialog[0]);
+
+        if(gtk_dialog_run(GTK_DIALOG(question_dialog[0])) == GTK_RESPONSE_YES){
+            gui_sns_file_save(NULL, NULL);
+        }
+        gtk_widget_destroy(GTK_WIDGET(question_dialog[0]));
+        free(question_dialog);
+    }
+}
+
+
 /* Menu function */
 void gui_sns_file_new(void *pass, int call_type){}
 void gui_sns_file_load(void *pass, int call_type){}

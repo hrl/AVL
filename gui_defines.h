@@ -14,8 +14,8 @@ const char *website = "https://github.com/hrl/AVL";
 const char *website_lable = "GitHub";
 const char *author[] = {"Ruilin Huang", NULL};
 
-FILE *file=NULL;
-short updated=0;
+FILE *sns_file=NULL;
+short sns_updated=0;
 GtkWindow *window=NULL;
 GtkTreeView *treeview=NULL;
 Sns *SNS=NULL;
