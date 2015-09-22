@@ -196,12 +196,12 @@ int tag_init(Sns *universal, Tag **self, char name[100], int id, int id_given) {
     }
 
     if (*self != NULL) {
-        return PEOPLE_INITED_ERROR;
+        return TAG_INITED_ERROR;
     }
 
     *self = (Tag*)malloc(sizeof(Tag));
     if (*self == NULL) {
-        return PEOPLE_INIT_FAIL_ERROR;
+        return TAG_INIT_FAIL_ERROR;
     }
 
     if (id_given == 1) {
@@ -212,7 +212,7 @@ int tag_init(Sns *universal, Tag **self, char name[100], int id, int id_given) {
     strcpy((*self)->name, name);
     int result;
     result = sns_insert_tag(universal, *self, id_given);
-    if(result != SNS_OP_SUCCESS) return PEOPLE_INIT_FAIL_ERROR;
+    if(result != SNS_OP_SUCCESS) return TAG_INIT_FAIL_ERROR;
 
     return TAG_OP_SUCCESS;
 }
