@@ -116,7 +116,7 @@ int sns_insert_people(Sns *self, People *people, int id_given){
     return SNS_OP_SUCCESS;
 }
 
-int sns_insert_tag(Sns *self, Tag *tag, int id_given) {
+int sns_insert_tag(Sns *self, Tag *tag, int id_given){
     if (self == NULL) {
         return SNS_UNINIT_ERROR;
     }
