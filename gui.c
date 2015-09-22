@@ -181,6 +181,15 @@ GtkWidget** gui_create_edit_dialog(GtkWindow *fwindow, int rws, char argi[][100]
     return dialog_response;
 }
 
+void gui_show_message(char *messages, GtkMessageType type){
+    GtkWidget **question_dialog = (GtkWidget **)malloc(sizeof(GtkWidget *)*(1));
+    question_dialog = gui_create_message_dialog(window, messages, type, question_dialog);
+    gtk_widget_show_all(question_dialog[0]);
+    gtk_dialog_run(GTK_DIALOG(question_dialog[0]));
+    gtk_widget_destroy(GTK_WIDGET(question_dialog[0]));
+    free(question_dialog);
+}
+
 void gui_save_confirmation(){
     if(sns_changed == 1){
         GtkWidget **question_dialog = (GtkWidget **)malloc(sizeof(GtkWidget *)*(1));
@@ -211,7 +220,55 @@ void gui_sns_file_new(void *pass, int call_type){
     sns_changed = 0;
 }
 
-void gui_sns_file_load(void *pass, int call_type){}
+char* _gui_file_choose(int type){
+    GtkWidget *dialog = NULL;
+    GtkFileChooser *chooser = NULL;
+
+    if(type == FILE_CHOOSE_OPEN){
+        dialog = gtk_file_chooser_dialog_new(
+                "打开", NULL, GTK_FILE_CHOOSER_ACTION_OPEN,
+                "取消", GTK_RESPONSE_CANCEL,
+                "确定", GTK_RESPONSE_ACCEPT, NULL);
+    } else if(type == FILE_CHOOSE_SAVE){
+        dialog = gtk_file_chooser_dialog_new(
+                "保存", NULL, GTK_FILE_CHOOSER_ACTION_SAVE,
+                "取消", GTK_RESPONSE_CANCEL,
+                "确定", GTK_RESPONSE_ACCEPT, NULL);
+        gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER(dialog), TRUE);
+    }
+
+    if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT){
+        char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+        gtk_widget_destroy(dialog);
+        return filename;
+    } else {
+        gtk_widget_destroy(dialog);
+        return NULL;
+    }
+}
+
+void gui_sns_file_load(void *pass, int call_type){
+    gui_save_confirmation();
+    char *filename=_gui_file_choose(FILE_CHOOSE_OPEN);
+    if(filename){
+        if(sns_file){
+            gui_close_file();
+            gui_clean_var();
+        }
+        int result;
+        result = sns_json_file_read(&SNS, filename);
+        if(result != SNS_OP_SUCCESS){
+            gui_clean_var();
+            gui_show_message("文件损坏", GTK_MESSAGE_ERROR);
+        }
+    } else {
+        gui_show_message("无法读取文件", GTK_MESSAGE_ERROR);
+    }
+    free(filename);
+    filename = NULL;
+    gui_clean_column();
+}
+
 void gui_sns_file_save(void *pass, int call_type){}
 void gui_sns_people_new(void *pass, int call_type){}
 void gui_sns_people_all(void *pass, int call_type){}
