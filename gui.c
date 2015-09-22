@@ -550,8 +550,7 @@ void _gui_sns_people_get_selection(People **people){
     }
 }
 
-int _gui_sns_people_people_id_dialog(People *self, char *messages, int (*callback)(People *, People *)){
-    People *people=(People*)self;
+int _gui_sns_get_people_by_id_dialog(char *messages, People **result_people){
     int rws=1;
     char title[100];
     char argi[rws*2+1][100];
@@ -587,10 +586,7 @@ int _gui_sns_people_people_id_dialog(People *self, char *messages, int (*callbac
             continue;
         }
 
-        People *target=NULL;
-        result = sns_search_people(SNS, id, &target);
-        if(result != SNS_OP_SUCCESS) continue;
-        result = (*callback)(self, target);
+        result = sns_search_people(SNS, id, result_people);
         break;
     }
 
@@ -600,8 +596,7 @@ int _gui_sns_people_people_id_dialog(People *self, char *messages, int (*callbac
     return result;
 }
 
-int _gui_sns_people_tag_id_dialog(People *self, char *messages, int (*callback)(People *, Tag *)){
-    People *people=(People*)self;
+int _gui_sns_get_tag_by_id_dialog(char *messages, Tag **result_tag){
     int rws=1;
     char title[100];
     char argi[rws*2+1][100];
@@ -637,10 +632,7 @@ int _gui_sns_people_tag_id_dialog(People *self, char *messages, int (*callback)(
             continue;
         }
 
-        Tag *target=NULL;
-        result = sns_search_tag(SNS, id, &target);
-        if(result != SNS_OP_SUCCESS) continue;
-        result = (*callback)(self, target);
+        result = sns_search_tag(SNS, id, result_tag);
         break;
     }
 
@@ -653,9 +645,12 @@ int _gui_sns_people_tag_id_dialog(People *self, char *messages, int (*callback)(
 void gui_sns_people_follow(void *pass, int call_type){
     People *people=NULL;
     _gui_sns_people_get_selection(&people);
+    People *target=NULL;
     if(people != NULL){
         int result;
-        result = _gui_sns_people_people_id_dialog(people, "添加新关注", people_follow);
+        result = _gui_sns_get_people_by_id_dialog("添加新关注", &target);
+        if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
+        result = people_follow(people, target);
         if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
         sns_changed = 1;
     }
@@ -666,9 +661,12 @@ void gui_sns_people_follow(void *pass, int call_type){
 void gui_sns_people_friend(void *pass, int call_type){
     People *people=NULL;
     _gui_sns_people_get_selection(&people);
+    People *target=NULL;
     if(people != NULL){
         int result;
-        result = _gui_sns_people_people_id_dialog(people, "添加新好友", people_friend);
+        result = _gui_sns_get_people_by_id_dialog("添加新好友", &target);
+        if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
+        result = people_friend(people, target);
         if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
         sns_changed = 1;
     }
@@ -679,9 +677,12 @@ void gui_sns_people_friend(void *pass, int call_type){
 void gui_sns_people_tag(void *pass, int call_type){
     People *people=NULL;
     _gui_sns_people_get_selection(&people);
+    Tag *target=NULL;
     if(people != NULL){
         int result;
-        result = _gui_sns_people_tag_id_dialog(people, "添加新爱好", people_tag);
+        result = _gui_sns_get_tag_by_id_dialog("添加新爱好", &target);
+        if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
+        result = people_tag(people, target);
         if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
         sns_changed = 1;
     }
@@ -692,9 +693,12 @@ void gui_sns_people_tag(void *pass, int call_type){
 void gui_sns_people_unfollow(void *pass, int call_type){
     People *people=NULL;
     _gui_sns_people_get_selection(&people);
+    People *target=NULL;
     if(people != NULL){
         int result;
-        result = _gui_sns_people_people_id_dialog(people, "取消关注", people_unfollow);
+        result = _gui_sns_get_people_by_id_dialog("取消关注", &target);
+        if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
+        result = people_unfollow(people, target);
         if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
         sns_changed = 1;
     }
@@ -705,9 +709,12 @@ void gui_sns_people_unfollow(void *pass, int call_type){
 void gui_sns_people_unfriend(void *pass, int call_type){
     People *people=NULL;
     _gui_sns_people_get_selection(&people);
+    People *target=NULL;
     if(people != NULL){
         int result;
-        result = _gui_sns_people_people_id_dialog(people, "取消好友", people_unfriend);
+        result = _gui_sns_get_people_by_id_dialog("取消好友", &target);
+        if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
+        result = people_unfriend(people, target);
         if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
         sns_changed = 1;
     }
@@ -718,9 +725,12 @@ void gui_sns_people_unfriend(void *pass, int call_type){
 void gui_sns_people_untag(void *pass, int call_type){
     People *people=NULL;
     _gui_sns_people_get_selection(&people);
+    Tag *target=NULL;
     if(people != NULL){
         int result;
-        result = _gui_sns_people_tag_id_dialog(people, "取消爱好", people_untag);
+        result = _gui_sns_get_tag_by_id_dialog("取消爱好", &target);
+        if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
+        result = people_untag(people, target);
         if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
         sns_changed = 1;
     }
@@ -764,7 +774,12 @@ void gui_sns_people_tags(void *pass, int call_type){
     _gui_sns_tag_common_show(SNS->_tags);
 }
 
-void gui_sns_people_c_followings(void *pass, int call_type){}
+void gui_sns_people_c_followings(void *pass, int call_type){
+    last_func = gui_sns_people_tags;
+    _gui_clean_column();
+    _gui_sns_people_common_show(SNS->_tags);
+}
+
 void gui_sns_people_c_followers(void *pass, int call_type){}
 void gui_sns_people_e_friends(void *pass, int call_type){}
 void gui_sns_people_c_tags(void *pass, int call_type){}
