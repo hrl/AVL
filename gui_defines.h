@@ -33,4 +33,30 @@ enum {
     FILE_CHOOSE_SAVE_AS,
 };
 
+enum {
+    TYPE_PEOPLE,
+    TYPE_TAG
+};
+
+enum {
+    PEOPLE_ALL,
+    TAG_ALL
+};
+
+enum {
+    PEOPLE_ALL_POINTER,
+    PEOPLE_ALL_TYPE,
+    PEOPLE_ALL_ID,
+    PEOPLE_ALL_NAME,
+    PEOPLE_ALL_COLUMNS
+};
+
+enum {
+    TAG_ALL_POINTER,
+    TAG_ALL_TYPE,
+    TAG_ALL_ID,
+    TAG_ALL_NAME,
+    TAG_ALL_COLUMNS
+};
+
 #endif //AVL_GUI_DEFINES_H
