@@ -14,6 +14,11 @@ struct sns {
     Set *_tags;
 };
 
+struct tag {
+    int id;
+    char name[100];
+};
+
 struct people {
     int id;
     char name[100];
@@ -26,6 +31,7 @@ struct people {
 };
 
 typedef struct sns Sns;
+typedef struct tag Tag;
 typedef struct people People;
 
 #endif //AVL_SNS_STRUCTS_H
