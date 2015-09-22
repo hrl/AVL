@@ -424,9 +424,6 @@ int people_extend_friends(Set *universal, People *self, Set **extend_friends){
     _pipe->self = self;
 
     int result;
-    // make a copy of self->_friends
-    result = set_extend(_pipe->result_set, self->_friends, people_compar);
-    if(result != SET_OP_SUCCESS) return PEOPLE_CIRCLE_FAIL_ERROR;
 
     // map self->_friends to extend result
     result = set_map(self->_friends, _pipe, _people_extend_friends);
@@ -434,6 +431,10 @@ int people_extend_friends(Set *universal, People *self, Set **extend_friends){
 
     // delete self from result
     result = set_delete(&(_pipe->result_set), self, people_compar);
+    if(result != SET_OP_SUCCESS) return PEOPLE_CIRCLE_FAIL_ERROR;
+
+    // delete self->_friends from result
+    result = set_contract(_pipe->result_set, self->_friends, people_compar);
     if(result != SET_OP_SUCCESS) return PEOPLE_CIRCLE_FAIL_ERROR;
 
     *extend_friends = _pipe->result_set;
