@@ -68,6 +68,10 @@ int sns_search_people(Sns *self, People *people, People **result_people, int *re
         return SNS_UNINIT_ERROR;
     }
 
+    if(people == NULL){
+        return PEOPLE_UNINIT_ERROR;
+    }
+
     int result;
     result = set_search(self->_peoples, people, (void **)result_people, result_found, people_compar);
     if(result != SET_OP_SUCCESS) return SNS_SEARCH_ERROR;
@@ -78,6 +82,10 @@ int sns_search_people(Sns *self, People *people, People **result_people, int *re
 int sns_search_tag(Sns *self, Tag *tag, Tag **result_tag, int *result_found){
     if(self == NULL){
         return SNS_UNINIT_ERROR;
+    }
+
+    if(tag == NULL){
+        return TAG_UNINIT_ERROR;
     }
 
     int result;
