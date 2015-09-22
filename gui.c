@@ -14,6 +14,7 @@
 #include "gui_structs.h"
 #include "sns_defines.h"
 #include "gui_defines.h"
+#include "set_functions.h"
 
 void build_UI() {
     GtkBuilder *builder = NULL;
@@ -116,7 +117,7 @@ void gui_clean_var(){
     SNS = NULL;
 }
 
-void gui_clean_column(){
+void _gui_clean_column(){
     int columns;
     GtkTreeViewColumn *column;
     columns = gtk_tree_view_get_n_columns(treeview);
@@ -307,7 +308,7 @@ void _gui_create_column(int type){
 void gui_sns_file_new(void *pass, int call_type){
     gui_save_confirmation();
     gui_clean_var();
-    gui_clean_column();
+    _gui_clean_column();
     sns_init(&SNS);
     sns_changed = 0;
     sns_filename = NULL;
@@ -351,7 +352,7 @@ void gui_sns_file_load(void *pass, int call_type){
             gui_clean_var();
             gui_show_message("文件损坏", GTK_MESSAGE_ERROR);
         }
-        gui_clean_column();
+        _gui_clean_column();
     }
 }
 
@@ -445,7 +446,54 @@ void gui_sns_people_new(void *pass, int call_type){
     }
 }
 
-void gui_sns_people_all(void *pass, int call_type){}
+struct _gui_sns_people_pipe {
+    GtkListStore **liststore;
+};
+typedef struct _gui_sns_people_pipe _Gui_sns_people_pipe;
+
+int _gui_sns_people_pipe_init(_Gui_sns_people_pipe **_pipe){
+    *_pipe = (_Gui_sns_people_pipe*)malloc(sizeof(_Gui_sns_people_pipe));
+    (*_pipe)->liststore = NULL;
+    return GUI_OP_SUCCESS;
+}
+
+int _gui_sns_people_pipe_del(_Gui_sns_people_pipe **_pipe){
+    free(*_pipe);
+    *_pipe = NULL;
+    return GUI_OP_SUCCESS;
+}
+
+int _gui_sns_people_insert_into_column(const void *data, void *_pipe){
+    _Gui_sns_people_pipe *pipe=NULL;
+    pipe = (_Gui_sns_people_pipe*)_pipe;
+    People *people=NULL;
+    people = (People*)data;
+
+    _gui_insert_into_list_store(pipe->liststore, &people, PEOPLE_ALL);
+
+    return GUI_OP_SUCCESS;
+}
+
+void gui_sns_people_all(void *pass, int call_type){
+    last_func = gui_sns_people_all;
+    _gui_clean_column();
+
+    GtkListStore *liststore=NULL;
+    _gui_create_list_store(&liststore, PEOPLE_ALL);
+
+    _Gui_sns_people_pipe *_pipe=NULL;
+    _gui_sns_people_pipe_init(&_pipe);
+    _pipe->liststore = &liststore;
+
+    Set *result_set=SNS->_peoples;
+    int result;
+    result = set_map(result_set, _pipe, _gui_sns_people_insert_into_column);
+    if(result != GUI_OP_SUCCESS) gui_show_message("查询失败", GTK_MESSAGE_WARNING);
+
+    gtk_tree_view_set_model(treeview, GTK_TREE_MODEL(liststore));
+    _gui_create_column(PEOPLE_ALL);
+}
+
 void gui_sns_people_follow(void *pass, int call_type){}
 void gui_sns_people_friend(void *pass, int call_type){}
 void gui_sns_people_tag(void *pass, int call_type){}

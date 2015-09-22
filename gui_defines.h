@@ -24,14 +24,18 @@ void (*last_func)(void *pass, int call_type)=NULL;
 Sns *SNS=NULL;
 
 enum {
+    GUI_OP_SUCCESS
+};
+
+enum {
     CALL_TYPE_NORMAL,
-    CALL_TYPE_REDO,
+    CALL_TYPE_REDO
 };
 
 enum {
     FILE_CHOOSE_OPEN,
     FILE_CHOOSE_SAVE,
-    FILE_CHOOSE_SAVE_AS,
+    FILE_CHOOSE_SAVE_AS
 };
 
 enum {
