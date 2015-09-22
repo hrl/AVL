@@ -523,7 +523,7 @@ void _gui_sns_people_get_selection(People **people){
     }
 }
 
-int _gui_sns_people_id_dialog(People *self, char *messages, int (*callback)(People *, People *)){
+int _gui_sns_people_people_id_dialog(People *self, char *messages, int (*callback)(People *, People *)){
     People *people=(People*)self;
     int rws=1;
     char title[100];
@@ -573,12 +573,62 @@ int _gui_sns_people_id_dialog(People *self, char *messages, int (*callback)(Peop
     return result;
 }
 
+int _gui_sns_people_tag_id_dialog(People *self, char *messages, int (*callback)(People *, Tag *)){
+    People *people=(People*)self;
+    int rws=1;
+    char title[100];
+    char argi[rws*2+1][100];
+
+    strcpy(title, messages);
+    strcpy(argi[0], title);
+    strcpy(argi[1], "爱好ID");
+    strcpy(argi[rws+1], "");
+
+    GtkWidget **dialog_result = (GtkWidget **)malloc(sizeof(GtkWidget *)*(rws*2+2));
+    dialog_result = gui_create_edit_dialog(window, rws, argi, dialog_result);
+    gtk_widget_show_all(dialog_result[0]);
+
+    char validate_message[100];
+    validate_message[0] = '\0';
+    int result;
+    GtkEntryBuffer *buffer;
+    char id_string[10];
+    int id;
+    while(gtk_dialog_run(GTK_DIALOG(dialog_result[0])) == GTK_RESPONSE_ACCEPT){
+        validate_message[0] = '\0';
+
+        buffer = gtk_entry_get_buffer(GTK_ENTRY(dialog_result[2*1+1]));
+        if(gtk_entry_buffer_get_length(buffer) >= 10){
+            strcpy(validate_message, "爱好ID过长");
+        } else {
+            strcpy(id_string, gtk_entry_buffer_get_text(buffer));
+            id = atoi(id_string);
+        }
+
+        if(validate_message[0] != '\0'){
+            gui_show_message(validate_message, GTK_MESSAGE_WARNING);
+            continue;
+        }
+
+        Tag *target=NULL;
+        result = sns_search_tag(SNS, id, &target);
+        if(result != SNS_OP_SUCCESS) continue;
+        result = (*callback)(self, target);
+        break;
+    }
+
+    gtk_widget_destroy(GTK_WIDGET(dialog_result[0]));
+    free(dialog_result);
+
+    return result;
+}
+
 void gui_sns_people_follow(void *pass, int call_type){
     People *people=NULL;
     _gui_sns_people_get_selection(&people);
     if(people != NULL){
         int result;
-        result = _gui_sns_people_id_dialog(people, "添加新关注", people_follow);
+        result = _gui_sns_people_people_id_dialog(people, "添加新关注", people_follow);
         if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
     }
 
@@ -590,13 +640,24 @@ void gui_sns_people_friend(void *pass, int call_type){
     _gui_sns_people_get_selection(&people);
     if(people != NULL){
         int result;
-        result = _gui_sns_people_id_dialog(people, "添加新好友", people_friend);
+        result = _gui_sns_people_people_id_dialog(people, "添加新好友", people_friend);
         if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
     }
 
     _gui_call_last_func();
 }
-void gui_sns_people_tag(void *pass, int call_type){}
+
+void gui_sns_people_tag(void *pass, int call_type){
+    People *people=NULL;
+    _gui_sns_people_get_selection(&people);
+    if(people != NULL){
+        int result;
+        result = _gui_sns_people_people_id_dialog(people, "添加新爱好", people_tag);
+        if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
+    }
+
+    _gui_call_last_func();
+}
 void gui_sns_people_unfollow(void *pass, int call_type){}
 void gui_sns_people_unfriend(void *pass, int call_type){}
 void gui_sns_people_untag(void *pass, int call_type){}
