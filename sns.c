@@ -125,7 +125,7 @@ int sns_insert_tag(Sns *self, Tag *tag) {
     return SNS_OP_SUCCESS;
 }
 
-int sns_delete(Sns *self, People *people){
+int sns_delete_people(Sns *self, People *people){
     if(self == NULL){
         return SNS_UNINIT_ERROR;
     }
@@ -260,7 +260,7 @@ int people_del(Sns *universal, People **self){
     set_map((*self)->_friends, _pipe, _people_del_refresh_set);
 
     // refresh universal set
-    sns_delete(universal, *self);
+    sns_delete_people(universal, *self);
 
     // delete self
     set_del(&((*self)->_followings));

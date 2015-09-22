@@ -14,7 +14,7 @@ int sns_search_people(Sns *self, People *people, People **result_people, int *re
 int sns_search_tag(Sns *self, Tag *tag, Tag **result_tag, int *result_found);
 int sns_insert_people(Sns *self, People *people);
 int sns_insert_tag(Sns *self, Tag *tag);
-int sns_delete(Sns *self, People *people);
+int sns_delete_people(Sns *self, People *people);
 int sns_map(Sns *self, void *pipe, int (*callback)(const void *, void *));
 int people_init(Sns *universal, People **self, char name[100]);
 int people_del(Sns *universal, People **self);
