@@ -190,6 +190,13 @@ int sns_map_people(Sns *self, void *pipe, int (*callback)(const void *, void *))
     return SNS_OP_SUCCESS;
 }
 
+int sns_map_tag(Sns *self, void *pipe, int (*callback)(const void *, void *)){
+    int result;
+    result = set_map(self->_tags, pipe, callback);
+    if(result != SET_OP_SUCCESS)return result;
+    return SNS_OP_SUCCESS;
+}
+
 int tag_init(Sns *universal, Tag **self, char name[100], int id, int id_given) {
     if (universal == NULL) {
         return SNS_UNINIT_ERROR;
