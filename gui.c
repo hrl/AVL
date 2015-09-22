@@ -454,28 +454,37 @@ void gui_sns_people_new(void *pass, int call_type){
     }
 }
 
-struct _gui_sns_people_pipe {
+struct _gui_sns_pipe {
     GtkListStore **liststore;
 };
-typedef struct _gui_sns_people_pipe _Gui_sns_people_pipe;
+typedef struct _gui_sns_pipe _Gui_sns_pipe;
 
-int _gui_sns_people_pipe_init(_Gui_sns_people_pipe **_pipe){
-    *_pipe = (_Gui_sns_people_pipe*)malloc(sizeof(_Gui_sns_people_pipe));
+int _gui_sns_pipe_init(_Gui_sns_pipe **_pipe){
+    *_pipe = (_Gui_sns_pipe*)malloc(sizeof(_Gui_sns_pipe));
     (*_pipe)->liststore = NULL;
     return GUI_OP_SUCCESS;
 }
 
-int _gui_sns_people_pipe_del(_Gui_sns_people_pipe **_pipe){
+int _gui_sns_pipe_del(_Gui_sns_pipe **_pipe){
     free(*_pipe);
     *_pipe = NULL;
     return GUI_OP_SUCCESS;
 }
 
 int _gui_sns_people_insert_into_column(const void *data, void *_pipe){
-    _Gui_sns_people_pipe *pipe=NULL;
-    pipe = (_Gui_sns_people_pipe*)_pipe;
+    _Gui_sns_pipe *pipe=NULL;
+    pipe = (_Gui_sns_pipe*)_pipe;
 
     _gui_insert_into_list_store(pipe->liststore, (People*)data, PEOPLE_ALL);
+
+    return GUI_OP_SUCCESS;
+}
+
+int _gui_sns_tag_insert_into_column(const void *data, void *_pipe){
+    _Gui_sns_pipe *pipe=NULL;
+    pipe = (_Gui_sns_pipe*)_pipe;
+
+    _gui_insert_into_list_store(pipe->liststore, (Tag*)data, TAG_ALL);
 
     return GUI_OP_SUCCESS;
 }
@@ -484,8 +493,8 @@ void _gui_sns_people_common_show(Set *people_set){
     GtkListStore *liststore=NULL;
     _gui_create_list_store(&liststore, PEOPLE_ALL);
 
-    _Gui_sns_people_pipe *_pipe=NULL;
-    _gui_sns_people_pipe_init(&_pipe);
+    _Gui_sns_pipe *_pipe=NULL;
+    _gui_sns_pipe_init(&_pipe);
     _pipe->liststore = &liststore;
 
     int result;
@@ -495,7 +504,25 @@ void _gui_sns_people_common_show(Set *people_set){
     gtk_tree_view_set_model(treeview, GTK_TREE_MODEL(liststore));
     _gui_create_column(PEOPLE_ALL);
 
-    _gui_sns_people_pipe_del(&_pipe);
+    _gui_sns_pipe_del(&_pipe);
+}
+
+void _gui_sns_tag_common_show(Set *tag_set){
+    GtkListStore *liststore=NULL;
+    _gui_create_list_store(&liststore, TAG_ALL);
+
+    _Gui_sns_pipe *_pipe=NULL;
+    _gui_sns_pipe_init(&_pipe);
+    _pipe->liststore = &liststore;
+
+    int result;
+    result = set_map(tag_set, _pipe, _gui_sns_tag_insert_into_column);
+    if(result != GUI_OP_SUCCESS) gui_show_message("查询失败", GTK_MESSAGE_WARNING);
+
+    gtk_tree_view_set_model(treeview, GTK_TREE_MODEL(liststore));
+    _gui_create_column(TAG_ALL);
+
+    _gui_sns_pipe_del(&_pipe);
 }
 
 void gui_sns_people_all(void *pass, int call_type){
