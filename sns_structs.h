@@ -15,6 +15,7 @@ struct sns {
 struct people {
     int id;
     char name[100];
+    // function people_del rely on the order of following pointers
     Set *_followings;
     Set *_followers;
     Set *_friends;
