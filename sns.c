@@ -437,6 +437,23 @@ int people_tag(People *self, Tag *target){
     return PEOPLE_OP_SUCCESS;
 }
 
+int people_untag(People *self, Tag *target){
+    if(self == NULL){
+        return PEOPLE_UNINIT_ERROR;
+    }
+
+    if(target == NULL){
+        return TAG_UNINIT_ERROR;
+    }
+
+    int result;
+    result = set_delete(&(self->_tags), target, tag_compar);
+    if(result != SET_OP_SUCCESS) return PEOPLE_TAG_FAIL_ERROR;
+
+    return PEOPLE_OP_SUCCESS;
+}
+
+
 int people_followings(People *self, Set **followings){
     if(self == NULL){
         return PEOPLE_UNINIT_ERROR;
