@@ -244,31 +244,31 @@ void _gui_insert_into_list_store(GtkListStore **liststore, void *data, int type)
     GtkTreeIter iterator;
     switch(type){
         case PEOPLE_ALL:{
-            People **people_iterator=(People**)data;
+            People *people_iterator=(People*)data;
             gtk_list_store_append(*liststore, &iterator);
             gtk_list_store_set(
                 *liststore, &iterator,
                 PEOPLE_ALL_POINTER, people_iterator,
                 PEOPLE_ALL_TYPE, TYPE_PEOPLE,
-                PEOPLE_ALL_ID, (*people_iterator)->id,
-                PEOPLE_ALL_NAME, (*people_iterator)->name,
-                PEOPLE_ALL_FOLLOWINGS_COUNT, (*people_iterator)->_followings->size,
-                PEOPLE_ALL_FOLLOWERS_COUNT, (*people_iterator)->_followers->size,
-                PEOPLE_ALL_FRIENDS_COUNT, (*people_iterator)->_friends->size,
-                PEOPLE_ALL_TAGS_COUNT, (*people_iterator)->_tags->size,
+                PEOPLE_ALL_ID, people_iterator->id,
+                PEOPLE_ALL_NAME, people_iterator->name,
+                PEOPLE_ALL_FOLLOWINGS_COUNT, people_iterator->_followings->size,
+                PEOPLE_ALL_FOLLOWERS_COUNT, people_iterator->_followers->size,
+                PEOPLE_ALL_FRIENDS_COUNT, people_iterator->_friends->size,
+                PEOPLE_ALL_TAGS_COUNT, people_iterator->_tags->size,
                 -1
             );
             break;
         }
         case TAG_ALL:{
-            Tag **tag_iterator=(Tag**)data;
+            Tag *tag_iterator=(Tag*)data;
             gtk_list_store_append(*liststore, &iterator);
             gtk_list_store_set(
                 *liststore, &iterator,
                 TAG_ALL_POINTER, tag_iterator,
                 TAG_ALL_TYPE, TYPE_TAG,
-                TAG_ALL_ID, (*tag_iterator)->id,
-                TAG_ALL_NAME, (*tag_iterator)->name,
+                TAG_ALL_ID, tag_iterator->id,
+                TAG_ALL_NAME, tag_iterator->name,
                 -1
             );
             break;
@@ -474,10 +474,8 @@ int _gui_sns_people_pipe_del(_Gui_sns_people_pipe **_pipe){
 int _gui_sns_people_insert_into_column(const void *data, void *_pipe){
     _Gui_sns_people_pipe *pipe=NULL;
     pipe = (_Gui_sns_people_pipe*)_pipe;
-    People *people=NULL;
-    people = (People*)data;
 
-    _gui_insert_into_list_store(pipe->liststore, &people, PEOPLE_ALL);
+    _gui_insert_into_list_store(pipe->liststore, (People*)data, PEOPLE_ALL);
 
     return GUI_OP_SUCCESS;
 }
@@ -516,7 +514,36 @@ void gui_sns_people_c_followings(void *pass, int call_type){}
 void gui_sns_people_c_followers(void *pass, int call_type){}
 void gui_sns_people_e_friends(void *pass, int call_type){}
 void gui_sns_people_c_tags(void *pass, int call_type){}
-void gui_sns_people_delete(void *pass, int call_type){}
+
+void gui_sns_people_delete(void *pass, int call_type){
+    GtkTreeSelection *selection = gtk_tree_view_get_selection(treeview);
+    GtkTreeIter iter;
+    GtkTreeModel *model;
+    gpointer *self;
+
+    if(gtk_tree_selection_get_selected(selection, &model, &iter)){
+        /* check */
+        gtk_tree_model_get(model, &iter, 0, &self, -1);
+        if(self == NULL) return;
+
+        GtkWidget **question_dialog = (GtkWidget **)malloc(sizeof(GtkWidget *)*(1));
+        question_dialog = gui_create_message_dialog(window, "确定要删除吗?", GTK_MESSAGE_QUESTION, question_dialog);
+        gtk_widget_show_all(question_dialog[0]);
+
+        if(gtk_dialog_run(GTK_DIALOG(question_dialog[0])) == GTK_RESPONSE_YES){
+            gtk_tree_model_get(model, &iter, 0, &self, -1);
+            int result;
+            result = people_del(SNS, ((People**)&self));
+            if(result != PEOPLE_OP_SUCCESS) gui_show_message("删除失败", GTK_MESSAGE_ERROR);
+            sns_changed = 1;
+        }
+        gtk_widget_destroy(GTK_WIDGET(question_dialog[0]));
+        free(question_dialog);
+    }
+
+    _gui_call_last_func();
+}
+
 void gui_sns_tag_new(void *pass, int call_type){}
 void gui_sns_tag_all(void *pass, int call_type){}
 void gui_sns_tag_delete(void *pass, int call_type){}
