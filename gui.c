@@ -165,7 +165,7 @@ GtkWidget** gui_create_edit_dialog(GtkWindow *fwindow, int rws, char argi[][100]
 }
 
 void gui_save_confirmation(){
-    if(!sns_updated){
+    if(sns_changed == 1){
         GtkWidget **question_dialog = (GtkWidget **)malloc(sizeof(GtkWidget *)*(1));
         question_dialog = gui_create_message_dialog(window, "更改尚未保存，要保存吗?", GTK_MESSAGE_QUESTION, question_dialog);
         gtk_widget_show_all(question_dialog[0]);
@@ -217,4 +217,7 @@ void gui_other_about(void *pass, int call_type){
     gtk_about_dialog_set_license_type(GTK_ABOUT_DIALOG(about_window), GTK_LICENSE_MIT_X11);
     gtk_widget_show_all(about_window);
 }
-void gui_other_quit(void *pass, int call_type){}
+void gui_other_quit(void *pass, int call_type){
+    gui_save_confirmation();
+    gtk_main_quit();
+}
