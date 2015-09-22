@@ -116,7 +116,7 @@ int sns_insert_people(Sns *self, People *people, int id_given){
     return SNS_OP_SUCCESS;
 }
 
-int sns_insert_tag(Sns *self, Tag *tag) {
+int sns_insert_tag(Sns *self, Tag *tag, int id_given) {
     if (self == NULL) {
         return SNS_UNINIT_ERROR;
     }
@@ -125,7 +125,9 @@ int sns_insert_tag(Sns *self, Tag *tag) {
         return TAG_UNINIT_ERROR;
     }
 
-    tag->id = self->tags_id_max + 1;
+    if(id_given == 0){
+        tag->id = self->tags_id_max + 1;
+    }
 
     int result;
     result = set_insert(&(self->_tags), tag, tag_compar);
