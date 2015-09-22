@@ -14,10 +14,23 @@ const char *website = "https://github.com/hrl/AVL";
 const char *website_lable = "GitHub";
 const char *author[] = {"Ruilin Huang", NULL};
 
-FILE *sns_file=NULL;
+char *sns_filename=NULL;
 short sns_changed=0;
 GtkWindow *window=NULL;
 GtkTreeView *treeview=NULL;
+void (*last_func)(void *pass, int call_type)=NULL;
+
 Sns *SNS=NULL;
+
+enum {
+    CALL_TYPE_NORMAL,
+    CALL_TYPE_REDO,
+};
+
+enum {
+    FILE_CHOOSE_OPEN,
+    FILE_CHOOSE_SAVE,
+    FILE_CHOOSE_SAVE_AS,
+};
 
 #endif //AVL_GUI_DEFINES_H
