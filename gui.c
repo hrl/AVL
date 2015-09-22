@@ -362,6 +362,8 @@ void _gui_sns_file_save_as(void *pass, int call_type){
         result = sns_json_file_write(SNS, sns_filename);
         if(result != SNS_OP_SUCCESS){
             gui_show_message("文件保存失败", GTK_MESSAGE_ERROR);
+        } else {
+            sns_changed = 0;
         }
     }
 }
@@ -374,6 +376,8 @@ void gui_sns_file_save(void *pass, int call_type){
     result = sns_json_file_write(SNS, sns_filename);
     if(result != SNS_OP_SUCCESS){
         gui_show_message("文件保存失败", GTK_MESSAGE_ERROR);
+    } else {
+        sns_changed = 0;
     }
 }
 
