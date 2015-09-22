@@ -75,6 +75,18 @@ int sns_search_people(Sns *self, People *people, People **result_people, int *re
     return SNS_OP_SUCCESS;
 }
 
+int sns_search_tag(Sns *self, Tag *tag, Tag **result_tag, int *result_found){
+    if(self == NULL){
+        return SNS_UNINIT_ERROR;
+    }
+
+    int result;
+    result = set_search(self->_tags, tag, (void **)result_tag, result_found, people_compar);
+    if(result != SET_OP_SUCCESS) return SNS_SEARCH_ERROR;
+
+    return SNS_OP_SUCCESS;
+}
+
 int sns_insert_people(Sns *self, People *people){
     if(self == NULL){
         return SNS_UNINIT_ERROR;
