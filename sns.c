@@ -63,7 +63,7 @@ int sns_del(Sns **self){
     return SNS_OP_SUCCESS;
 }
 
-int sns_search(Sns *self, People *people, People **result_people, int *result_found){
+int sns_search_people(Sns *self, People *people, People **result_people, int *result_found){
     if(self == NULL){
         return SNS_UNINIT_ERROR;
     }

@@ -10,7 +10,7 @@
 int people_compar(const void *a, const void *b);
 int sns_init(Sns **self);
 int sns_del(Sns **self);
-int sns_search(Sns *self, People *people, People **result_people, int *result_found);
+int sns_search_people(Sns *self, People *people, People **result_people, int *result_found);
 int sns_insert_people(Sns *self, People *people);
 int sns_insert_tag(Sns *self, Tag *tag);
 int sns_delete(Sns *self, People *people);
