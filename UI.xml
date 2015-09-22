@@ -17,13 +17,13 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
-              <object class="GtkMenuItem" id="menuitem_file">
+              <object class="GtkMenuItem" id="menuitem_sns">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">SNS</property>
                 <property name="use_underline">True</property>
                 <child type="submenu">
-                  <object class="GtkMenu" id="menu_file">
+                  <object class="GtkMenu" id="menu_sns">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
@@ -70,7 +70,7 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <child>
-                              <object class="GtkMenuItem" id="sns_people_add">
+                              <object class="GtkMenuItem" id="sns_people_new">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">新建用户</property>
@@ -81,6 +81,12 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">查看所有用户</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkSeparatorMenuItem" id="separatormenuitem4">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
                               </object>
                             </child>
                             <child>
@@ -95,6 +101,34 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">添加新好友</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkMenuItem" id="sns_people_tag">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">添加新爱好</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkMenuItem" id="sns_people_unfollow">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">取消关注</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkMenuItem" id="sns_people_unfriend">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">取消好友</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkMenuItem" id="sns_people_untag">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">取消爱好</property>
                               </object>
                             </child>
                             <child>
@@ -196,6 +230,19 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">新建爱好</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkMenuItem" id="sns_tag_all">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">查看所有爱好</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkSeparatorMenuItem" id="separatormenuitem3">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
                               </object>
                             </child>
                             <child>
