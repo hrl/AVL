@@ -141,6 +141,22 @@ int sns_delete_people(Sns *self, People *people){
     return SNS_OP_SUCCESS;
 }
 
+int sns_delete_tag(Sns *self, Tag *tag) {
+    if (self == NULL) {
+        return SNS_UNINIT_ERROR;
+    }
+
+    if (tag == NULL) {
+        return TAG_UNINIT_ERROR;
+    }
+
+    int result;
+    result = set_delete(&(self->_tags), tag, tag_compar);
+    if (result != SET_OP_SUCCESS) return SNS_DELETE_FAIL_ERROR;
+
+    return SNS_OP_SUCCESS;
+}
+
 int sns_map(Sns *self, void *pipe, int (*callback)(const void *, void *)){
     int result;
     result = set_map(self->_peoples, pipe, callback);
