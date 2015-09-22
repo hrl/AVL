@@ -218,8 +218,12 @@ void _gui_create_list_store(GtkListStore **liststore, int type){
                 PEOPLE_ALL_COLUMNS,
                 G_TYPE_POINTER,
                 G_TYPE_INT,
-                G_TYPE_INT,   // PEOPLE_ALL_ID
-                G_TYPE_STRING // PEOPLE_ALL_NAME
+                G_TYPE_INT,    // PEOPLE_ALL_ID
+                G_TYPE_STRING, // PEOPLE_ALL_NAME
+                G_TYPE_INT,    // PEOPLE_ALL_FOLLOWINGS_COUNT
+                G_TYPE_INT,    // PEOPLE_ALL_FOLLOWERS_COUNT
+                G_TYPE_INT,    // PEOPLE_ALL_FRIENDS_COUNT
+                G_TYPE_INT     // PEOPLE_ALL_TAGS_COUNT
             );
             break;
         }
@@ -248,6 +252,10 @@ void _gui_insert_into_list_store(GtkListStore **liststore, void *data, int type)
                 PEOPLE_ALL_TYPE, TYPE_PEOPLE,
                 PEOPLE_ALL_ID, (*people_iterator)->id,
                 PEOPLE_ALL_NAME, (*people_iterator)->name,
+                PEOPLE_ALL_FOLLOWINGS_COUNT, (*people_iterator)->_followings->size,
+                PEOPLE_ALL_FOLLOWERS_COUNT, (*people_iterator)->_followers->size,
+                PEOPLE_ALL_FRIENDS_COUNT, (*people_iterator)->_friends->size,
+                PEOPLE_ALL_TAGS_COUNT, (*people_iterator)->_tags->size,
                 -1
             );
             break;
@@ -288,9 +296,9 @@ void _gui_append_column(char column_title[][20], int column_line[], int cls){
 void _gui_create_column(int type){
     switch(type){
         case PEOPLE_ALL:{
-            char column_title[2][20] = {"ID", "用户名"};
-            int column_line[2] = {PEOPLE_ALL_ID, PEOPLE_ALL_NAME};
-            int cls=2;
+            char column_title[6][20] = {"ID", "用户名", "关注数", "粉丝数", "好友数", "爱好数"};
+            int column_line[6] = {PEOPLE_ALL_ID, PEOPLE_ALL_NAME, PEOPLE_ALL_FOLLOWINGS_COUNT, PEOPLE_ALL_FOLLOWERS_COUNT, PEOPLE_ALL_FRIENDS_COUNT, PEOPLE_ALL_TAGS_COUNT};
+            int cls=6;
             _gui_append_column(column_title, column_line, cls);
             break;
         }
