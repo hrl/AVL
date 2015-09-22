@@ -688,7 +688,18 @@ void gui_sns_people_unfriend(void *pass, int call_type){
     _gui_call_last_func();
 }
 
-void gui_sns_people_untag(void *pass, int call_type){}
+void gui_sns_people_untag(void *pass, int call_type){
+    People *people=NULL;
+    _gui_sns_people_get_selection(&people);
+    if(people != NULL){
+        int result;
+        result = _gui_sns_people_tag_id_dialog(people, "取消爱好", people_untag);
+        if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
+        sns_changed = 1;
+    }
+
+    _gui_call_last_func();
+}
 
 void gui_sns_people_followings(void *pass, int call_type){
     People *people=NULL;
