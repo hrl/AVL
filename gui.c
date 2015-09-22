@@ -105,6 +105,11 @@ void build_UI() {
 }
 
 /* Basic function */
+void clean_var(){
+    sns_del(&SNS);
+    SNS = NULL;
+}
+
 GtkWidget** gui_create_message_dialog(GtkWindow *fwindow, char *messages, GtkMessageType type, GtkWidget **dialog_response){
     GtkButtonsType buttons = GTK_BUTTONS_OK;
     switch(type){
