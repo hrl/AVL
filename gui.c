@@ -204,20 +204,14 @@ void gui_save_confirmation(){
     }
 }
 
-void gui_close_file(){
-    if(sns_file != NULL){
-        fclose(sns_file);
-        sns_file = NULL;
-    }
-}
-
 /* Menu function */
 void gui_sns_file_new(void *pass, int call_type){
     gui_save_confirmation();
-    gui_close_file();
     gui_clean_var();
     gui_clean_column();
+    sns_init(&SNS);
     sns_changed = 0;
+    sns_filename = NULL;
 }
 
 char* _gui_file_choose(int type){
@@ -249,27 +243,41 @@ char* _gui_file_choose(int type){
 
 void gui_sns_file_load(void *pass, int call_type){
     gui_save_confirmation();
-    char *filename=_gui_file_choose(FILE_CHOOSE_OPEN);
-    if(filename){
-        if(sns_file){
-            gui_close_file();
-            gui_clean_var();
-        }
+    sns_filename=_gui_file_choose(FILE_CHOOSE_OPEN);
+    if(sns_filename != NULL){
+        gui_clean_var();
         int result;
-        result = sns_json_file_read(&SNS, filename);
+        result = sns_json_file_read(&SNS, sns_filename);
         if(result != SNS_OP_SUCCESS){
             gui_clean_var();
             gui_show_message("文件损坏", GTK_MESSAGE_ERROR);
         }
-    } else {
-        gui_show_message("无法读取文件", GTK_MESSAGE_ERROR);
+        gui_clean_column();
     }
-    free(filename);
-    filename = NULL;
-    gui_clean_column();
 }
 
-void gui_sns_file_save(void *pass, int call_type){}
+void gui_sns_file_save_as(void *pass, int call_type){
+    sns_filename=_gui_file_choose(FILE_CHOOSE_SAVE);
+    if(sns_filename != NULL){
+        int result;
+        result = sns_json_file_write(SNS, sns_filename);
+        if(result != SNS_OP_SUCCESS){
+            gui_show_message("文件保存失败", GTK_MESSAGE_ERROR);
+        }
+    }
+}
+
+void gui_sns_file_save(void *pass, int call_type){
+    if(sns_filename == NULL){
+        return gui_sns_file_save_as(pass, call_type);
+    }
+    int result;
+    result = sns_json_file_write(SNS, sns_filename);
+    if(result != SNS_OP_SUCCESS){
+        gui_show_message("文件保存失败", GTK_MESSAGE_ERROR);
+    }
+}
+
 void gui_sns_people_new(void *pass, int call_type){}
 void gui_sns_people_all(void *pass, int call_type){}
 void gui_sns_people_follow(void *pass, int call_type){}
@@ -307,6 +315,6 @@ void gui_other_about(void *pass, int call_type){
 
 void gui_other_quit(void *pass, int call_type){
     gui_save_confirmation();
-    gui_close_file();
+    sns_filename = NULL;
     gtk_main_quit();
 }
