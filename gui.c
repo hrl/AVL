@@ -943,7 +943,12 @@ void gui_sns_tag_new(void *pass, int call_type){
     }
 }
 
-void gui_sns_tag_all(void *pass, int call_type){}
+void gui_sns_tag_all(void *pass, int call_type){
+    last_func = gui_sns_tag_all;
+    _gui_clean_column();
+    _gui_sns_tag_common_show(SNS->_tags);
+}
+
 void gui_sns_tag_delete(void *pass, int call_type){}
 
 void gui_other_about(void *pass, int call_type){
