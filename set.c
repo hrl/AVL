@@ -366,6 +366,9 @@ int set_is_equal(Set *set_a, Set *set_b, int *result_is_equal, int (*compar)(con
 }
 
 int set_map(Set *self, void *pipe, int (*callback)(const void *, void *)){
+    //if(self->size == 0){
+    //    return SET_OP_SUCCESS;
+    //}
     int result;
     result = avl_level_order_traversal(self->_tree, pipe, callback);
     if(result != TREE_OP_SUCCESS)return result;

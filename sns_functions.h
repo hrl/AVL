@@ -49,6 +49,7 @@ int people_tags(People *self, Set **tags);
 int people_has_following(People *self, People *target, int *is_following);
 int people_has_follower(People *self, People *target, int *is_follower);
 int people_has_friend(People *self, People *target, int *is_friend);
+int people_has_tag(People *self, Tag *target, int *has_tag);
 int people_common_followings(People *self, People *target, Set **common_followings);
 int people_common_followers(People *self, People *target, Set **common_followers);
 int people_common_tags(People *self, People *target, Set **common_tags);

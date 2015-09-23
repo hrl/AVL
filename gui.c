@@ -650,8 +650,12 @@ void gui_sns_people_follow(void *pass, int call_type){
     People *target=NULL;
     if(people != NULL){
         int result;
+        int has_following;
         result = _gui_sns_get_people_by_id_dialog("添加新关注", &target);
         if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
+        result = people_has_following(people, target, &has_following);
+        if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
+        if(has_following == 1) return gui_show_message("已经关注", GTK_MESSAGE_WARNING);
         result = people_follow(people, target);
         if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
         sns_changed = 1;
@@ -666,8 +670,12 @@ void gui_sns_people_friend(void *pass, int call_type){
     People *target=NULL;
     if(people != NULL){
         int result;
+        int has_friend;
         result = _gui_sns_get_people_by_id_dialog("添加新好友", &target);
         if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
+        result = people_has_friend(people, target, &has_friend);
+        if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
+        if(has_friend == 1) return gui_show_message("已是好友", GTK_MESSAGE_WARNING);
         result = people_friend(people, target);
         if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
         sns_changed = 1;
@@ -682,8 +690,12 @@ void gui_sns_people_tag(void *pass, int call_type){
     Tag *target=NULL;
     if(people != NULL){
         int result;
+        int has_tag;
         result = _gui_sns_get_tag_by_id_dialog("添加新爱好", &target);
         if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
+        result = people_has_tag(people, target, &has_tag);
+        if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
+        if(has_tag == 1) return gui_show_message("已有爱好", GTK_MESSAGE_WARNING);
         result = people_tag(people, target);
         if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
         sns_changed = 1;
@@ -698,8 +710,12 @@ void gui_sns_people_unfollow(void *pass, int call_type){
     People *target=NULL;
     if(people != NULL){
         int result;
+        int has_following;
         result = _gui_sns_get_people_by_id_dialog("取消关注", &target);
         if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
+        result = people_has_following(people, target, &has_following);
+        if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
+        if(has_following == 0) return gui_show_message("尚未关注", GTK_MESSAGE_WARNING);
         result = people_unfollow(people, target);
         if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
         sns_changed = 1;
@@ -714,8 +730,12 @@ void gui_sns_people_unfriend(void *pass, int call_type){
     People *target=NULL;
     if(people != NULL){
         int result;
+        int has_friend;
         result = _gui_sns_get_people_by_id_dialog("取消好友", &target);
         if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
+        result = people_has_friend(people, target, &has_friend);
+        if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
+        if(has_friend == 0) return gui_show_message("无此好友", GTK_MESSAGE_WARNING);
         result = people_unfriend(people, target);
         if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
         sns_changed = 1;
@@ -730,8 +750,12 @@ void gui_sns_people_untag(void *pass, int call_type){
     Tag *target=NULL;
     if(people != NULL){
         int result;
+        int has_tag;
         result = _gui_sns_get_tag_by_id_dialog("取消爱好", &target);
         if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
+        result = people_has_tag(people, target, &has_tag);
+        if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
+        if(has_tag == 0) return gui_show_message("无此爱好", GTK_MESSAGE_WARNING);
         result = people_untag(people, target);
         if(result != SNS_OP_SUCCESS) return gui_show_message("操作失败", GTK_MESSAGE_WARNING);
         sns_changed = 1;

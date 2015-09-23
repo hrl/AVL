@@ -599,7 +599,6 @@ int _people_common_pipe_init(_People_common_pipe **_pipe, int (*compar)(const vo
     (*_pipe)->self_tag = NULL;
     (*_pipe)->refresh_shift = 0;
     (*_pipe)->result_set = NULL;
-    set_init(&((*_pipe)->result_set));
     (*_pipe)->compar = compar;
     return PEOPLE_OP_SUCCESS;
 }
@@ -608,7 +607,6 @@ int _people_common_pipe_del(_People_common_pipe **_pipe){
     if(*_pipe == NULL){
         return PEOPLE_OP_SUCCESS;
     }
-    set_del(&((*_pipe)->result_set));
     free(*_pipe);
     *_pipe = NULL;
     return PEOPLE_OP_SUCCESS;
@@ -1026,6 +1024,7 @@ int people_extend_friends(People *self, Set **extend_friends){
     _people_common_pipe_init(&_pipe, people_compar);
 
     _pipe->self = self;
+    set_init(&(_pipe->result_set));
 
     int result;
 
