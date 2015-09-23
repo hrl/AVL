@@ -650,6 +650,8 @@ int tag_del(Sns *universal, Tag **self){
     free(*self);
     *self = NULL;
 
+    _people_common_pipe_del(&_pipe);
+
     return TAG_OP_SUCCESS;
 }
 
