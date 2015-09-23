@@ -47,6 +47,11 @@ int set_search(Set *self, void *data, void **result_data, int *result_found, int
     if(self == NULL){
         return SET_UNINIT_ERROR;
     }
+    if(self->size == 0){
+        *result_data = NULL;
+        *result_found = 0;
+        return SET_OP_SUCCESS;
+    }
 
     int result;
     result = avl_search(self->_tree, data, result_data, result_found, compar);
