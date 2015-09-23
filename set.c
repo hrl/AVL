@@ -87,9 +87,12 @@ int set_delete(Set **self, void *data, int (*compar)(const void *, const void *)
     }
 
     int result;
-    result = avl_delete(&((*self)->_tree), data, compar);
+    int deleted=1;
+    result = avl_delete(&((*self)->_tree), data, &deleted, compar);
     if(result != TREE_OP_SUCCESS)return SET_DELETE_FAIL_ERROR;
-    (*self)->size--;
+    if(deleted == 1){
+        (*self)->size--;
+    }
 
     return SET_OP_SUCCESS;
 }

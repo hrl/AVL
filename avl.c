@@ -176,7 +176,7 @@ int _avl_rotate(Tree **self){
     return TREE_OP_SUCCESS;
 }
 
-int avl_delete(Tree **self, void *data, int (*compar)(const void *, const void *)){
+int avl_delete(Tree **self, void *data, int *deleted, int (*compar)(const void *, const void *)){
     if(*self == NULL){
         return TREE_UNINIT_ERROR;
     }
@@ -204,21 +204,23 @@ int avl_delete(Tree **self, void *data, int (*compar)(const void *, const void *
             (*self)->data = left_iterator->data;
 
             // then delete the minimum child in right tree
-            result = avl_delete(&((*self)->right), (*self)->data, compar);
+            result = avl_delete(&((*self)->right), (*self)->data, deleted, compar);
             if(result != TREE_OP_SUCCESS)return result;
             (*self)->height = _max(avl_height_direct((*self)->left), avl_height_direct((*self)->right)) + 1;
         }
     } else if(compar_result < 0){
         if((*self)->left == NULL){
+            *deleted = 0;
             return TREE_OP_SUCCESS;
         }
-        result = avl_delete(&((*self)->left), data, compar);
+        result = avl_delete(&((*self)->left), data, deleted, compar);
         if(result != TREE_OP_SUCCESS)return result;
     } else {
         if((*self)->right == NULL){
+            *deleted = 0;
             return TREE_OP_SUCCESS;
         }
-        result = avl_delete(&((*self)->right), data, compar);
+        result = avl_delete(&((*self)->right), data, deleted, compar);
         if(result != TREE_OP_SUCCESS)return result;
     }
 
