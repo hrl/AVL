@@ -775,9 +775,22 @@ void gui_sns_people_tags(void *pass, int call_type){
 }
 
 void gui_sns_people_c_followings(void *pass, int call_type){
-    last_func = gui_sns_people_tags;
-    _gui_clean_column();
-    _gui_sns_people_common_show(SNS->_tags);
+    People *people=NULL;
+    _gui_sns_people_get_selection(&people);
+    if(people != NULL){
+        People *target=NULL;
+        int result;
+        result = _gui_sns_get_people_by_id_dialog("查看共同关注", &target);
+        if(result != SNS_OP_SUCCESS || target == NULL) return gui_show_message("获取用户失败", GTK_MESSAGE_WARNING);
+
+        Set *target_set=NULL;
+        result = people_common_followings(people, target, &target_set);
+        if(result != SNS_OP_SUCCESS || target_set == NULL) return gui_show_message("获取共同关注列表失败", GTK_MESSAGE_WARNING);
+
+        last_func = gui_sns_people_c_followings;
+        _gui_clean_column();
+        _gui_sns_people_common_show(target_set);
+    }
 }
 
 void gui_sns_people_c_followers(void *pass, int call_type){}
