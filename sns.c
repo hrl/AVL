@@ -979,10 +979,7 @@ int _people_extend_friends(const void *data, void *_pipe){
     return PEOPLE_OP_SUCCESS;
 }
 
-int people_extend_friends(Set *universal, People *self, Set **extend_friends){
-    if(universal == NULL){
-        return SNS_UNINIT_ERROR;
-    }
+int people_extend_friends(People *self, Set **extend_friends){
     if(self == NULL){
         return PEOPLE_UNINIT_ERROR;
     }

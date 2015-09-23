@@ -812,7 +812,21 @@ void gui_sns_people_c_followers(void *pass, int call_type){
     }
 }
 
-void gui_sns_people_e_friends(void *pass, int call_type){}
+void gui_sns_people_e_friends(void *pass, int call_type){
+    People *people=NULL;
+    _gui_sns_people_get_selection(&people);
+    if(people != NULL){
+        int result;
+        Set *target_set=NULL;
+        result = people_extend_friends(people, &target_set);
+        if(result != SNS_OP_SUCCESS || target_set == NULL) return gui_show_message("获取二度好友列表失败", GTK_MESSAGE_WARNING);
+
+        last_func = gui_sns_people_e_friends;
+        _gui_clean_column();
+        _gui_sns_people_common_show(target_set);
+    }
+}
+
 void gui_sns_people_c_tags(void *pass, int call_type){}
 
 void gui_sns_people_delete(void *pass, int call_type){

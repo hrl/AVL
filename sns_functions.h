@@ -52,6 +52,6 @@ int people_has_friend(People *self, People *target, int *is_friend);
 int people_common_followings(People *self, People *target, Set **common_followings);
 int people_common_followers(People *self, People *target, Set **common_followers);
 int people_common_tags(People *self, People *target, Set **common_tags);
-int people_extend_friends(Set *universal, People *self, Set **extend_friends);
+int people_extend_friends(People *self, Set **extend_friends);
 
 #endif //AVL_SNS_FUNCTIONS_H
