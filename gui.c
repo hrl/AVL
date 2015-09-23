@@ -804,9 +804,9 @@ void gui_sns_people_c_followers(void *pass, int call_type){
 
         Set *target_set=NULL;
         result = people_common_followers(people, target, &target_set);
-        if(result != SNS_OP_SUCCESS || target_set == NULL) return gui_show_message("获取共同关注列表失败", GTK_MESSAGE_WARNING);
+        if(result != SNS_OP_SUCCESS || target_set == NULL) return gui_show_message("获取共同粉丝列表失败", GTK_MESSAGE_WARNING);
 
-        last_func = gui_sns_people_c_followings;
+        last_func = gui_sns_people_c_followers;
         _gui_clean_column();
         _gui_sns_people_common_show(target_set);
     }
