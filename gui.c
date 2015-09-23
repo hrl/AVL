@@ -827,7 +827,24 @@ void gui_sns_people_e_friends(void *pass, int call_type){
     }
 }
 
-void gui_sns_people_c_tags(void *pass, int call_type){}
+void gui_sns_people_c_tags(void *pass, int call_type){
+    People *people=NULL;
+    _gui_sns_people_get_selection(&people);
+    if(people != NULL){
+        People *target=NULL;
+        int result;
+        result = _gui_sns_get_people_by_id_dialog("查看共同爱好", &target);
+        if(result != SNS_OP_SUCCESS || target == NULL) return gui_show_message("获取用户失败", GTK_MESSAGE_WARNING);
+
+        Set *target_set=NULL;
+        result = people_common_tags(people, target, &target_set);
+        if(result != SNS_OP_SUCCESS || target_set == NULL) return gui_show_message("获取共同爱好列表失败", GTK_MESSAGE_WARNING);
+
+        last_func = gui_sns_people_c_tags;
+        _gui_clean_column();
+        _gui_sns_tag_common_show(target_set);
+    }
+}
 
 void gui_sns_people_delete(void *pass, int call_type){
     GtkTreeSelection *selection = gtk_tree_view_get_selection(treeview);
