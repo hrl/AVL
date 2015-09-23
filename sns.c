@@ -573,11 +573,58 @@ int tag_init(Sns *universal, Tag **self, char name[100], int id, int id_given) {
         (*self)->id = 0;
     }
     strcpy((*self)->name, name);
+    (*self)->_peoples = NULL;
+
     int result;
+    result = set_init(&((*self)->_peoples));
+    if(result != SET_OP_SUCCESS) return TAG_INIT_FAIL_ERROR;
     result = sns_insert_tag(universal, *self, id_given);
     if(result != SNS_OP_SUCCESS) return TAG_INIT_FAIL_ERROR;
 
     return TAG_OP_SUCCESS;
+}
+
+struct _people_common_pipe {
+    People *self;
+    Tag *self_tag;
+    int refresh_shift;
+    Set *result_set;
+    int (*compar)(const void *, const void *);
+};
+typedef struct _people_common_pipe _People_common_pipe;
+
+int _people_common_pipe_init(_People_common_pipe **_pipe, int (*compar)(const void *, const void *)){
+    *_pipe = (_People_common_pipe*)malloc(sizeof(_People_common_pipe));
+    (*_pipe)->self = NULL;
+    (*_pipe)->self_tag = NULL;
+    (*_pipe)->refresh_shift = 0;
+    (*_pipe)->result_set = NULL;
+    set_init(&((*_pipe)->result_set));
+    (*_pipe)->compar = compar;
+    return PEOPLE_OP_SUCCESS;
+}
+
+int _people_common_pipe_del(_People_common_pipe **_pipe){
+    if(*_pipe == NULL){
+        return PEOPLE_OP_SUCCESS;
+    }
+    set_del(&((*_pipe)->result_set));
+    free(*_pipe);
+    *_pipe = NULL;
+    return PEOPLE_OP_SUCCESS;
+}
+
+int _tag_del_refresh_set(const void *data, void *_pipe){
+    _People_common_pipe *pipe;
+    pipe = (_People_common_pipe*)_pipe;
+    // data: People*
+    Set *target_set;
+    target_set = ((People*)data)->_tags;
+
+    int result;
+    result = set_delete(&target_set, pipe->self_tag, pipe->compar);
+    if(result != SET_OP_SUCCESS) return PEOPLE_DEL_FAIL_ERROR;
+    return PEOPLE_OP_SUCCESS;
 }
 
 int tag_del(Sns *universal, Tag **self){
@@ -589,7 +636,17 @@ int tag_del(Sns *universal, Tag **self){
         return TAG_OP_SUCCESS;
     }
 
+    _People_common_pipe *_pipe=NULL;
+    _people_common_pipe_init(&_pipe, tag_compar);
+
+    _pipe->self_tag = *self;
+
+    // refresh users' tags set
+    set_map((*self)->_peoples, _pipe, _tag_del_refresh_set);
+
     sns_delete_tag(universal, *self);
+
+    set_del(&((*self)->_peoples));
     free(*self);
     *self = NULL;
 
@@ -635,34 +692,6 @@ int people_init(Sns *universal, People **self, char name[100], int id, int id_gi
     result = sns_insert_people(universal, *self, id_given);
     if(result != SNS_OP_SUCCESS) return PEOPLE_INIT_FAIL_ERROR;
 
-    return PEOPLE_OP_SUCCESS;
-}
-
-struct _people_common_pipe {
-    People *self;
-    int refresh_shift;
-    Set *result_set;
-    int (*compar)(const void *, const void *);
-};
-typedef struct _people_common_pipe _People_common_pipe;
-
-int _people_common_pipe_init(_People_common_pipe **_pipe, int (*compar)(const void *, const void *)){
-    *_pipe = (_People_common_pipe*)malloc(sizeof(_People_common_pipe));
-    (*_pipe)->self = NULL;
-    (*_pipe)->refresh_shift = 0;
-    (*_pipe)->result_set = NULL;
-    set_init(&((*_pipe)->result_set));
-    (*_pipe)->compar = compar;
-    return PEOPLE_OP_SUCCESS;
-}
-
-int _people_common_pipe_del(_People_common_pipe **_pipe){
-    if(*_pipe == NULL){
-        return PEOPLE_OP_SUCCESS;
-    }
-    set_del(&((*_pipe)->result_set));
-    free(*_pipe);
-    *_pipe = NULL;
     return PEOPLE_OP_SUCCESS;
 }
 
@@ -796,6 +825,8 @@ int people_tag(People *self, Tag *target){
     int result;
     result = set_insert(&(self->_tags), target, tag_compar);
     if(result != SET_OP_SUCCESS) return PEOPLE_TAG_FAIL_ERROR;
+    result = set_insert(&(target->_peoples), self, people_compar);
+    if(result != SET_OP_SUCCESS) return PEOPLE_TAG_FAIL_ERROR;
 
     return PEOPLE_OP_SUCCESS;
 }
@@ -811,6 +842,8 @@ int people_untag(People *self, Tag *target){
 
     int result;
     result = set_delete(&(self->_tags), target, tag_compar);
+    if(result != SET_OP_SUCCESS) return PEOPLE_TAG_FAIL_ERROR;
+    result = set_delete(&(target->_peoples), self, people_compar);
     if(result != SET_OP_SUCCESS) return PEOPLE_TAG_FAIL_ERROR;
 
     return PEOPLE_OP_SUCCESS;

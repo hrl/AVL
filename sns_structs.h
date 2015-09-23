@@ -17,6 +17,7 @@ struct sns {
 struct tag {
     int id;
     char name[100];
+    Set *_peoples;
 };
 
 struct people {
