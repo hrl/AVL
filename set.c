@@ -4,6 +4,7 @@
 
 #include <stddef.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "avl_functions.h"
 #include "set_functions.h"
 #include "set_structs.h"
@@ -151,7 +152,7 @@ int _set_intersection(const void *data, void *pipe){
     int result, search_result;
     result = set_is_member(_pipe->set_large, (void *)data, &search_result, _pipe->compar);
     if(result != SET_OP_SUCCESS)return result;
-    if(search_result == 0){
+    if(search_result != 0){
         result = _set_init_or_insert(&(_pipe->result), 0, (void *)data, _pipe->compar);
         if(result != SET_OP_SUCCESS)return SET_INTERSECTION_ERROR;
     }
@@ -172,6 +173,7 @@ int set_intersection(Set *set_a, Set *set_b, Set **result_intersection, int (*co
 
     _set_sort_by_size(&set_a, &set_b);
     _pipe->set_large = set_a;
+    set_init(&(_pipe->result));
 
     result = set_map(set_b, _pipe, _set_intersection);
     if(result != SET_OP_SUCCESS)return result;
@@ -222,6 +224,7 @@ int set_union(Set *set_a, Set *set_b, Set **result_union, int (*compar)(const vo
     int result;
     _Set_common_pipe *_pipe=NULL;
     _set_common_pipe_init(&_pipe, compar);
+    set_init(&(_pipe->result));
 
     result = set_map(set_a, _pipe, _set_extend);
     if(result != SET_OP_SUCCESS)return result;
@@ -241,7 +244,7 @@ int _set_difference(const void *data, void *pipe){
     int result, search_result;
     result = set_is_member(_pipe->set_large, (void *)data, &search_result, _pipe->compar);
     if(result != SET_OP_SUCCESS)return result;
-    if(search_result != 0){
+    if(search_result == 0){
         result = _set_init_or_insert(&(_pipe->result), 0, (void *)data, _pipe->compar);
         if(result != SET_OP_SUCCESS)return SET_DIFFERENCE_ERROR;
     }
@@ -259,6 +262,7 @@ int set_difference(Set *set_a, Set *set_b, Set **result_difference, int (*compar
     int result;
     _Set_common_pipe *_pipe=NULL;
     _set_common_pipe_init(&_pipe, compar);
+    set_init(&(_pipe->result));
 
     // large is nonsensical here
     _pipe->set_large = set_b;
