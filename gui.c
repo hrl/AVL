@@ -879,7 +879,70 @@ void gui_sns_people_delete(void *pass, int call_type){
     _gui_call_last_func();
 }
 
-void gui_sns_tag_new(void *pass, int call_type){}
+int _gui_sns_tag_dialog(void *self) {
+    Tag **tag = (Tag **) self;
+    int rws = 1;
+    char title[100];
+    char argi[rws * 2 + 1][100];
+
+    if (tag == NULL) {
+        strcpy(title, "新建爱好");
+        strcpy(argi[rws + 1], "");
+    } else {
+        strcpy(title, "编辑爱好");
+        strcpy(argi[rws + 1], (*tag)->name);
+    }
+    strcpy(argi[0], title);
+    strcpy(argi[1], "爱好名");
+
+    GtkWidget **dialog_result = (GtkWidget **) malloc(sizeof(GtkWidget *) * (rws * 2 + 2));
+    dialog_result = gui_create_edit_dialog(window, rws, argi, dialog_result);
+    gtk_widget_show_all(dialog_result[0]);
+
+    char validate_message[100];
+    validate_message[0] = '\0';
+    int result;
+    GtkEntryBuffer *buffer;
+    char name[100];
+    while (gtk_dialog_run(GTK_DIALOG(dialog_result[0])) == GTK_RESPONSE_ACCEPT) {
+        validate_message[0] = '\0';
+
+        buffer = gtk_entry_get_buffer(GTK_ENTRY(dialog_result[2 * 1 + 1]));
+        if (gtk_entry_buffer_get_length(buffer) >= 100) {
+            strcpy(validate_message, "爱好名过长");
+        } else {
+            strcpy(name, gtk_entry_buffer_get_text(buffer));
+        }
+
+        if (validate_message[0] != '\0') {
+            gui_show_message(validate_message, GTK_MESSAGE_WARNING);
+            continue;
+        }
+
+        if (tag == NULL) {
+            Tag *_tag_tmp = NULL;
+            tag = &_tag_tmp;
+            result = tag_init(SNS, tag, name, 0, 0);
+        } else {
+            strcpy((*tag)->name, name);
+            result = PEOPLE_OP_SUCCESS;
+        }
+        break;
+    }
+
+    gtk_widget_destroy(GTK_WIDGET(dialog_result[0]));
+    free(dialog_result);
+
+    return result;
+}
+
+void gui_sns_tag_new(void *pass, int call_type){
+    if(_gui_sns_tag_dialog(NULL) == TAG_OP_SUCCESS){
+        sns_changed = 1;
+        _gui_call_last_func();
+    }
+}
+
 void gui_sns_tag_all(void *pass, int call_type){}
 void gui_sns_tag_delete(void *pass, int call_type){}
 
