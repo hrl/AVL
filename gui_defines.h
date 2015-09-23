@@ -65,6 +65,7 @@ enum {
     TAG_ALL_TYPE,
     TAG_ALL_ID,
     TAG_ALL_NAME,
+    TAG_ALL_PEOPLES_COUNT,
     TAG_ALL_COLUMNS
 };
 

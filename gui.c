@@ -232,8 +232,9 @@ void _gui_create_list_store(GtkListStore **liststore, int type){
                 TAG_ALL_COLUMNS,
                 G_TYPE_POINTER,
                 G_TYPE_INT,
-                G_TYPE_INT,   // TAG_ALL_ID
-                G_TYPE_STRING // TAG_ALL_NAME
+                G_TYPE_INT,    // TAG_ALL_ID
+                G_TYPE_STRING, // TAG_ALL_NAME
+                G_TYPE_INT     // TAG_ALL_PEOPLES_COUNT
             );
             break;
         }
@@ -269,6 +270,7 @@ void _gui_insert_into_list_store(GtkListStore **liststore, void *data, int type)
                 TAG_ALL_TYPE, TYPE_TAG,
                 TAG_ALL_ID, tag_iterator->id,
                 TAG_ALL_NAME, tag_iterator->name,
+                TAG_ALL_PEOPLES_COUNT, tag_iterator->_peoples->size,
                 -1
             );
             break;
@@ -303,9 +305,9 @@ void _gui_create_column(int type){
             break;
         }
         case TAG_ALL:{
-            char column_title[2][20] = {"ID", "爱好名"};
-            int column_line[2] = {TAG_ALL_ID, TAG_ALL_NAME};
-            int cls=2;
+            char column_title[3][20] = {"ID", "爱好名", "用户数"};
+            int column_line[3] = {TAG_ALL_ID, TAG_ALL_NAME, TAG_ALL_PEOPLES_COUNT};
+            int cls=3;
             _gui_append_column(column_title, column_line, cls);
             break;
         }
