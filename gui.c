@@ -949,7 +949,57 @@ void gui_sns_tag_all(void *pass, int call_type){
     _gui_sns_tag_common_show(SNS->_tags);
 }
 
-void gui_sns_tag_delete(void *pass, int call_type){}
+void _gui_sns_tag_get_selection(Tag **tag){
+    GtkTreeSelection *selection = gtk_tree_view_get_selection(treeview);
+    GtkTreeIter iter;
+    GtkTreeModel *model;
+    gpointer *self;
+    gint type;
+
+    if(gtk_tree_selection_get_selected(selection, &model, &iter)) {
+        /* check */
+        gtk_tree_model_get(model, &iter, 0, &self, -1);
+        gtk_tree_model_get(model, &iter, 1, &type, -1);
+        if(self == NULL || type != TYPE_TAG) return gui_show_message("请先选择爱好", GTK_MESSAGE_INFO);
+
+        *tag = (Tag*)self;
+    } else {
+        gui_show_message("请先选择爱好", GTK_MESSAGE_INFO);
+    }
+}
+
+void gui_sns_tag_delete(void *pass, int call_type){
+    GtkTreeSelection *selection = gtk_tree_view_get_selection(treeview);
+    GtkTreeIter iter;
+    GtkTreeModel *model;
+    gpointer *self;
+    gint type;
+
+    if(gtk_tree_selection_get_selected(selection, &model, &iter)){
+        /* check */
+        gtk_tree_model_get(model, &iter, 0, &self, -1);
+        gtk_tree_model_get(model, &iter, 1, &type, -1);
+        if(self == NULL || type != TYPE_TAG) return gui_show_message("请先选择爱好", GTK_MESSAGE_INFO);
+
+        GtkWidget **question_dialog = (GtkWidget **)malloc(sizeof(GtkWidget *)*(1));
+        question_dialog = gui_create_message_dialog(window, "确定要删除吗?", GTK_MESSAGE_QUESTION, question_dialog);
+        gtk_widget_show_all(question_dialog[0]);
+
+        if(gtk_dialog_run(GTK_DIALOG(question_dialog[0])) == GTK_RESPONSE_YES){
+            gtk_tree_model_get(model, &iter, 0, &self, -1);
+            int result;
+            result = tag_del(SNS, ((Tag**)&self));
+            if(result != TAG_OP_SUCCESS) gui_show_message("删除失败", GTK_MESSAGE_ERROR);
+            sns_changed = 1;
+        }
+        gtk_widget_destroy(GTK_WIDGET(question_dialog[0]));
+        free(question_dialog);
+    } else {
+        return gui_show_message("请先选择爱好", GTK_MESSAGE_INFO);
+    }
+
+    _gui_call_last_func();
+}
 
 void gui_other_about(void *pass, int call_type){
     GtkWidget *about_window = NULL;
