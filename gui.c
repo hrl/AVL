@@ -1,6 +1,8 @@
 //
 // Created by hrl on 9/22/15.
 //
+// SNS function lib
+// based on SNS function lib and SET function lib
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -17,6 +19,10 @@
 #include "set_functions.h"
 
 void build_UI() {
+    /*
+     * build the main UI
+     *
+     * */
     GtkBuilder *builder = NULL;
     GError *error = NULL;
     builder = gtk_builder_new();
@@ -118,6 +124,10 @@ void gui_clean_var(){
 }
 
 void _gui_clean_column(){
+    /*
+     * clean all columns in screen
+     *
+     * */
     int columns;
     GtkTreeViewColumn *column;
     columns = gtk_tree_view_get_n_columns(treeview);
@@ -130,6 +140,11 @@ void _gui_clean_column(){
 }
 
 GtkWidget** gui_create_message_dialog(GtkWindow *fwindow, char *messages, GtkMessageType type, GtkWidget **dialog_response){
+    /*
+     * create a message dialog which will display param `messages`
+     * the style of the dialog will be determined by param `type`
+     *
+     * */
     GtkButtonsType buttons = GTK_BUTTONS_OK;
     switch(type){
         case GTK_MESSAGE_ERROR: buttons = GTK_BUTTONS_OK; break;
@@ -153,6 +168,12 @@ GtkWidget** gui_create_message_dialog(GtkWindow *fwindow, char *messages, GtkMes
 }
 
 GtkWidget** gui_create_edit_dialog(GtkWindow *fwindow, int rws, char argi[][100], GtkWidget **dialog_response){
+    /*
+     * create a edit dialog
+     * param `rws` is the number of lines you want to display
+     * param `argi` contains the message you want to display
+     *
+     * */
     GtkDialogFlags flags = GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT;
 
     dialog_response[0] = GTK_WIDGET(gtk_dialog_new_with_buttons(
@@ -189,6 +210,13 @@ GtkWidget** gui_create_edit_dialog(GtkWindow *fwindow, int rws, char argi[][100]
 }
 
 void gui_show_message(char *messages, GtkMessageType type){
+    /*
+     * create then show a message dialog
+     * the style of the dialog will be determined by param `type`
+     *
+     * this function is a simple warpper to function gui_create_message_dialog
+     *
+     * */
     GtkWidget **question_dialog = (GtkWidget **)malloc(sizeof(GtkWidget *)*(1));
     question_dialog = gui_create_message_dialog(window, messages, type, question_dialog);
     gtk_widget_show_all(question_dialog[0]);
@@ -198,6 +226,12 @@ void gui_show_message(char *messages, GtkMessageType type){
 }
 
 void gui_save_confirmation(){
+    /*
+     * create then show a save confirmation dialog
+     *
+     * this function is a simple warpper to function gui_create_message_dialog
+     *
+     * */
     if(sns_changed == 1){
         GtkWidget **question_dialog = (GtkWidget **)malloc(sizeof(GtkWidget *)*(1));
         question_dialog = gui_create_message_dialog(window, "更改尚未保存，要保存吗?", GTK_MESSAGE_QUESTION, question_dialog);
@@ -212,6 +246,10 @@ void gui_save_confirmation(){
 }
 
 void _gui_create_list_store(GtkListStore **liststore, int type){
+    /*
+     * create a GtkListStore according to the param `type`
+     *
+     * */
     switch(type){
         case PEOPLE_ALL:{
             *liststore = gtk_list_store_new(
@@ -242,6 +280,10 @@ void _gui_create_list_store(GtkListStore **liststore, int type){
 }
 
 void _gui_insert_into_list_store(GtkListStore **liststore, void *data, int type){
+    /*
+     * Insert data into liststore according to the param `type`
+     *
+     * */
     GtkTreeIter iterator;
     switch(type){
         case PEOPLE_ALL:{
@@ -279,6 +321,10 @@ void _gui_insert_into_list_store(GtkListStore **liststore, void *data, int type)
 }
 
 void _gui_append_column(char column_title[][20], int column_line[], int cls){
+    /*
+     * append column into global treeview
+     *
+     * */
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
     renderer = gtk_cell_renderer_text_new();
@@ -296,6 +342,10 @@ void _gui_append_column(char column_title[][20], int column_line[], int cls){
 }
 
 void _gui_create_column(int type){
+    /*
+     * create column according to the param `type`
+     *
+     * */
     switch(type){
         case PEOPLE_ALL:{
             char column_title[6][20] = {"ID", "用户名", "关注数", "粉丝数", "好友数", "爱好数"};
@@ -316,6 +366,10 @@ void _gui_create_column(int type){
 
 /* Menu function */
 void gui_sns_file_new(void *pass, int call_type){
+    /*
+     * create a new inner file
+     *
+     * */
     gui_save_confirmation();
     gui_clean_var();
     _gui_clean_column();
@@ -325,6 +379,10 @@ void gui_sns_file_new(void *pass, int call_type){
 }
 
 char* _gui_file_choose(int type){
+    /*
+     * create a file choose dialog according to param `type`
+     *
+     * */
     GtkWidget *dialog = NULL;
     GtkFileChooser *chooser = NULL;
 
@@ -352,6 +410,10 @@ char* _gui_file_choose(int type){
 }
 
 void gui_sns_file_load(void *pass, int call_type){
+    /*
+     * load SNS data from file
+     *
+     * */
     gui_save_confirmation();
     sns_filename=_gui_file_choose(FILE_CHOOSE_OPEN);
     if(sns_filename != NULL){
@@ -367,6 +429,10 @@ void gui_sns_file_load(void *pass, int call_type){
 }
 
 void _gui_sns_file_save_as(void *pass, int call_type){
+    /*
+     * create a file "save as" dialog
+     *
+     * */
     sns_filename=_gui_file_choose(FILE_CHOOSE_SAVE);
     if(sns_filename != NULL){
         int result;
@@ -380,6 +446,10 @@ void _gui_sns_file_save_as(void *pass, int call_type){
 }
 
 void gui_sns_file_save(void *pass, int call_type){
+    /*
+     * create a file "save" dialog
+     *
+     * */
     if(sns_filename == NULL){
         return _gui_sns_file_save_as(pass, call_type);
     }
@@ -393,6 +463,10 @@ void gui_sns_file_save(void *pass, int call_type){
 }
 
 int _gui_sns_people_dialog(void *self){
+    /*
+     * create a people create/edit dialog, do some input check, then apply create/edit to param `self`
+     *
+     * */
     People **people=(People**)self;
     int rws=1;
     char title[100];
@@ -450,6 +524,10 @@ int _gui_sns_people_dialog(void *self){
 }
 
 void gui_sns_people_new(void *pass, int call_type){
+    /*
+     * create a create people dialog
+     *
+     * */
     if(_gui_sns_people_dialog(NULL) == PEOPLE_OP_SUCCESS){
         sns_changed = 1;
         _gui_call_last_func();
@@ -457,6 +535,10 @@ void gui_sns_people_new(void *pass, int call_type){
 }
 
 struct _gui_sns_pipe {
+    /*
+     * common pipe to store tmp value during map
+     *
+     * */
     GtkListStore **liststore;
 };
 typedef struct _gui_sns_pipe _Gui_sns_pipe;
@@ -474,6 +556,11 @@ int _gui_sns_pipe_del(_Gui_sns_pipe **_pipe){
 }
 
 int _gui_sns_people_insert_into_column(const void *data, void *_pipe){
+    /*
+     * this function will be called by the map/traversal function
+     * param data will be inserted into _pipe->liststore
+     *
+     * */
     _Gui_sns_pipe *pipe=NULL;
     pipe = (_Gui_sns_pipe*)_pipe;
 
@@ -483,6 +570,11 @@ int _gui_sns_people_insert_into_column(const void *data, void *_pipe){
 }
 
 int _gui_sns_tag_insert_into_column(const void *data, void *_pipe){
+    /*
+     * this function will be called by the map/traversal function
+     * param data will be inserted into _pipe->liststore
+     *
+     * */
     _Gui_sns_pipe *pipe=NULL;
     pipe = (_Gui_sns_pipe*)_pipe;
 
@@ -492,6 +584,10 @@ int _gui_sns_tag_insert_into_column(const void *data, void *_pipe){
 }
 
 void _gui_sns_people_common_show(Set *people_set){
+    /*
+     * show peoples' information
+     *
+     * */
     GtkListStore *liststore=NULL;
     _gui_create_list_store(&liststore, PEOPLE_ALL);
 
@@ -510,6 +606,10 @@ void _gui_sns_people_common_show(Set *people_set){
 }
 
 void _gui_sns_tag_common_show(Set *tag_set){
+    /*
+     * show tags' information
+     *
+     * */
     GtkListStore *liststore=NULL;
     _gui_create_list_store(&liststore, TAG_ALL);
 
@@ -534,6 +634,10 @@ void gui_sns_people_all(void *pass, int call_type){
 }
 
 void _gui_sns_people_get_selection(People **people){
+    /*
+     * get the selected people
+     *
+     * */
     GtkTreeSelection *selection = gtk_tree_view_get_selection(treeview);
     GtkTreeIter iter;
     GtkTreeModel *model;
@@ -553,6 +657,10 @@ void _gui_sns_people_get_selection(People **people){
 }
 
 int _gui_sns_get_people_by_id_dialog(char *messages, People **result_people){
+    /*
+     * create a dialog to get people by input id
+     *
+     * */
     int rws=1;
     char title[100];
     char argi[rws*2+1][100];
@@ -599,6 +707,10 @@ int _gui_sns_get_people_by_id_dialog(char *messages, People **result_people){
 }
 
 int _gui_sns_get_tag_by_id_dialog(char *messages, Tag **result_tag){
+    /*
+     * create a dialog to get tag by input id
+     *
+     * */
     int rws=1;
     char title[100];
     char argi[rws*2+1][100];
@@ -1032,6 +1144,10 @@ void gui_sns_tag_delete(void *pass, int call_type){
 }
 
 void gui_other_about(void *pass, int call_type){
+    /*
+     * print a about dialog
+     *
+     * */
     GtkWidget *about_window = NULL;
     about_window = gtk_about_dialog_new();
     gtk_about_dialog_set_program_name(GTK_ABOUT_DIALOG(about_window), program_name);
@@ -1046,6 +1162,10 @@ void gui_other_about(void *pass, int call_type){
 }
 
 void gui_other_quit(void *pass, int call_type){
+    /*
+     * quit program
+     *
+     * */
     gui_save_confirmation();
     sns_filename = NULL;
     gtk_main_quit();

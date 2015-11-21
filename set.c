@@ -1,6 +1,8 @@
 //
 // Created by hrl on 9/11/15.
 //
+// SET function lib
+// based on AVL function lib
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -15,7 +17,11 @@
 // size == 0 (_tree == NULL) : null set
 
 int set_init(Set **self){
-    // create a null set
+    /*
+     * create a null SET
+     * *self must point to NULL
+     *
+     * */
     if(*self != NULL){
         return SET_INITED_ERROR;
     }
@@ -32,6 +38,10 @@ int set_init(Set **self){
 }
 
 int set_del(Set **self){
+    /*
+     * recursively delete(free) a SET
+     *
+     */
     if(*self == NULL){
         return SET_OP_SUCCESS;
     }
@@ -44,6 +54,17 @@ int set_del(Set **self){
 }
 
 int set_search(Set *self, void *data, void **result_data, int *result_found, int (*compar)(const void *, const void *)){
+    /*
+     * Search data in SET `self`
+     * data in param and data in SET struct will be compared in function compar
+     *
+     * if found, *result_data will be set to the target data
+     *           result_found will be set to TRUE
+     * if not, result_found will be set to FALSE
+     *
+     * this function is a simple warpper to function avl_search
+     *
+     * */
     if(self == NULL){
         return SET_UNINIT_ERROR;
     }
@@ -60,6 +81,16 @@ int set_search(Set *self, void *data, void **result_data, int *result_found, int
 }
 
 int set_is_member(Set *self, void *data, int *result_is_member, int (*compar)(const void *, const void *)){
+    /*
+     * Search data in SET `self`
+     * data in param and data in SET struct will be compared in function compar
+     *
+     * if found, result_is_member will be set to TRUE
+     * if not, result_is_member will be set to FALSE
+     *
+     * this function is a simple warpper to function set_is_member
+     *
+     * */
     if(self == NULL){
         return SET_UNINIT_ERROR;
     }
@@ -73,6 +104,13 @@ int set_is_member(Set *self, void *data, int *result_is_member, int (*compar)(co
 }
 
 int set_insert(Set **self, void *data, int (*compar)(const void *, const void *)){
+    /*
+     * Insert data into SET `self`
+     * data in param and data in SET struct will be compared in function compar
+     *
+     * this function is a simple warpper to function avl_insert
+     *
+     */
     if(*self == NULL){
         return SET_UNINIT_ERROR;
     }
@@ -87,6 +125,11 @@ int set_insert(Set **self, void *data, int (*compar)(const void *, const void *)
 }
 
 int set_delete(Set **self, void *data, int (*compar)(const void *, const void *)){
+    /*
+     * Delete data from SET `self`
+     * data in param and data in AVL struct will be compared in function compar
+     *
+     */
     if(*self == NULL){
         return SET_UNINIT_ERROR;
     }
@@ -103,6 +146,12 @@ int set_delete(Set **self, void *data, int (*compar)(const void *, const void *)
 }
 
 int _set_sort_by_size(Set **set_a, Set **set_b){
+    /*
+     * inner function
+     * *set_a will be set to the SET which is larger
+     * *set_b will be set to the SET whic is smaller
+     *
+     * */
     if((*set_a)->size < (*set_b)->size){
         Set *tmp;
         tmp = *set_a;
@@ -113,6 +162,12 @@ int _set_sort_by_size(Set **set_a, Set **set_b){
 }
 
 int _set_init_or_insert(Set **self, int pass_same, void *data, int (*compar)(const void *, const void *)){
+    /*
+     * inner function
+     * init a SET with param data, then set `self` to this SET
+     * or insert param data into SET `self`
+     *
+     * */
     int result;
     if(*self == NULL){
         result = set_init(self);
@@ -126,6 +181,10 @@ int _set_init_or_insert(Set **self, int pass_same, void *data, int (*compar)(con
 }
 
 struct _set_common_pipe {
+    /*
+     * common pipe to store tmp value during map
+     *
+     * */
     Set *set_large;
     Set *set_small;
     Set *result;
@@ -155,6 +214,11 @@ int _set_common_pipe_del(_Set_common_pipe **_pipe){
 }
 
 int _set_intersection(const void *data, void *pipe){
+    /*
+     * this function will be called by the map/traversal function
+     * if param data is in SET _pipe->set_large, param data will be inserted into SET _pipe->set_large
+     *
+     * */
     _Set_common_pipe *_pipe=NULL;
     _pipe = (_Set_common_pipe*)pipe;
     int result, search_result;
@@ -176,24 +240,34 @@ int set_intersection(Set *set_a, Set *set_b, Set **result_intersection, int (*co
     }
 
     int result;
+    // init commom pipe
     _Set_common_pipe *_pipe=NULL;
     _set_common_pipe_init(&_pipe, compar);
 
+    // find the larger one
     _set_sort_by_size(&set_a, &set_b);
     _pipe->set_large = set_a;
+    // init result set
     set_init(&(_pipe->result));
 
+    // map set_b's member to function _set_intersection
     result = set_map(set_b, _pipe, _set_intersection);
     if(result != SET_OP_SUCCESS)return result;
 
     *result_intersection = _pipe->result;
 
+    // free common pipe
     _set_common_pipe_del(&_pipe);
 
     return SET_OP_SUCCESS;
 }
 
 int _set_extend(const void *data, void *pipe){
+    /*
+     * this function will be called by the map/traversal function
+     * param data will be inserted into SET _pipe->set_large
+     *
+     * */
     _Set_common_pipe *_pipe=NULL;
     _pipe = (_Set_common_pipe*)pipe;
     int result;
@@ -208,14 +282,17 @@ int set_extend(Set *set_a, Set *set_b, int (*compar)(const void *, const void *)
         return SET_UNINIT_ERROR;
     }
     int result;
+    // init common pipe
     _Set_common_pipe *_pipe=NULL;
     _set_common_pipe_init(&_pipe, compar);
 
     _pipe->result = set_a;
 
+    // map set_b's member to function _set_extend
     result = set_map(set_b, _pipe, _set_extend);
     if(result != SET_OP_SUCCESS)return result;
 
+    // free common pipe
     _set_common_pipe_del(&_pipe);
 
     return SET_OP_SUCCESS;
@@ -230,23 +307,33 @@ int set_union(Set *set_a, Set *set_b, Set **result_union, int (*compar)(const vo
     }
 
     int result;
+    // init common pipe
     _Set_common_pipe *_pipe=NULL;
     _set_common_pipe_init(&_pipe, compar);
+    // init result SET
     set_init(&(_pipe->result));
 
+    // map set_a's member to function _set_extend
     result = set_map(set_a, _pipe, _set_extend);
     if(result != SET_OP_SUCCESS)return result;
+    // map set_b's member to function _set_extend
     result = set_map(set_b, _pipe, _set_extend);
     if(result != SET_OP_SUCCESS)return result;
 
     *result_union = _pipe->result;
 
+    // free common pipe
     _set_common_pipe_del(&_pipe);
 
     return SET_OP_SUCCESS;
 }
 
 int _set_difference(const void *data, void *pipe){
+    /*
+     * this function will be called by the map/traversal function
+     * if param data is !NOT! in SET _pipe->set_large, param data will be inserted into SET _pipe->set_large
+     *
+     * */
     _Set_common_pipe *_pipe=NULL;
     _pipe = (_Set_common_pipe*)pipe;
     int result, search_result;
@@ -268,6 +355,7 @@ int set_difference(Set *set_a, Set *set_b, Set **result_difference, int (*compar
     }
 
     int result;
+    // init common pipe
     _Set_common_pipe *_pipe=NULL;
     _set_common_pipe_init(&_pipe, compar);
     set_init(&(_pipe->result));
@@ -275,17 +363,24 @@ int set_difference(Set *set_a, Set *set_b, Set **result_difference, int (*compar
     // large is nonsensical here
     _pipe->set_large = set_b;
 
+    // map set_a's member to function _set_difference
     result = set_map(set_a, _pipe, _set_difference);
     if(result != SET_OP_SUCCESS)return result;
 
     *result_difference = _pipe->result;
 
+    // free common pipe
     _set_common_pipe_del(&_pipe);
 
     return SET_OP_SUCCESS;
 }
 
 int _set_contract(const void *data, void *pipe){
+    /*
+     * this function will be called by the map/traversal function
+     * if param data is in SET _pipe->set_large, param data will be deleted from SET _pipe->set_large
+     *
+     * */
     _Set_common_pipe *_pipe=NULL;
     _pipe = (_Set_common_pipe*)pipe;
     int result, search_result;
@@ -304,21 +399,29 @@ int set_contract(Set *set_a, Set *set_b, int (*compar)(const void *, const void 
     }
 
     int result;
+    // init common pipe
     _Set_common_pipe *_pipe=NULL;
     _set_common_pipe_init(&_pipe, compar);
 
     // large is nonsensical here
     _pipe->set_large = set_a;
 
+    // map set_b's member to function _set_contract
     result = set_map(set_b, _pipe, _set_contract);
     if(result != SET_OP_SUCCESS)return result;
 
+    // free common pipe
     _set_common_pipe_del(&_pipe);
 
     return SET_OP_SUCCESS;
 }
 
 int _set_is_subset(const void *data, void *pipe) {
+    /*
+     * this function will be called by the map/traversal function
+     * if param data is in SET _pipe->set_large, _pipe->result_int will be set to FALSE
+     *
+     * */
     _Set_common_pipe *_pipe = NULL;
     _pipe = (_Set_common_pipe *) pipe;
     int result, search_result;
@@ -331,6 +434,11 @@ int _set_is_subset(const void *data, void *pipe) {
 }
 
 int set_is_subset(Set *set_a, Set *set_b, int *result_is_subset, int (*compar)(const void *, const void *)){
+    /*
+     * if set_a is a subset of set_b, result_is_subset will be set to TRUE
+     * if not, result_is_subset will set to FALSE
+     *
+     * */
     if(set_a == NULL || set_b == NULL){
         return SET_UNINIT_ERROR;
     }
@@ -341,17 +449,21 @@ int set_is_subset(Set *set_a, Set *set_b, int *result_is_subset, int (*compar)(c
     }
 
     int result;
+    // init common pipe
     _Set_common_pipe *_pipe=NULL;
     _set_common_pipe_init(&_pipe, compar);
 
     _pipe->set_large = set_b;
+    // set the default result
     _pipe->result_int = 1;
 
+    // map set_b's member to function _set_is_subset
     result = set_map(set_a, _pipe, _set_is_subset);
     if(result != SET_OP_SUCCESS)return result;
 
     *result_is_subset = _pipe->result_int;
 
+    // free common pipe
     _set_common_pipe_del(&_pipe);
 
     return SET_OP_SUCCESS;
@@ -371,9 +483,14 @@ int set_is_equal(Set *set_a, Set *set_b, int *result_is_equal, int (*compar)(con
 }
 
 int set_map(Set *self, void *pipe, int (*callback)(const void *, void *)){
-    //if(self->size == 0){
-    //    return SET_OP_SUCCESS;
-    //}
+    /*
+     * apply callback function to each data and the input param
+     *
+     * if the callback function's return value is not `SET_OP_SUCCESS`, map will be aborted
+     *
+     * this function is a simple warpper to function avl_level_order_traversal
+     *
+     * */
     int result;
     result = avl_level_order_traversal(self->_tree, pipe, callback);
     if(result != TREE_OP_SUCCESS)return result;

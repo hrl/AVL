@@ -8,7 +8,9 @@
 #include "avl_structs.h"
 
 struct set {
+    // inner tree to store value
     Tree *_tree;
+    // store SET's size
     int size;
 };
 

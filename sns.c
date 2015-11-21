@@ -1,6 +1,8 @@
 //
 // Created by hrl on 9/21/15.
 //
+// SNS function lib
+// based on SET function lib
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -33,6 +35,13 @@ int people_compar(const void *a, const void *b){
 }
 
 int sns_json_file_read(Sns **self, char *filename){
+    /*
+     * load SNS data from the selected file
+     * *self must point to NULL
+     *
+     * this function is a simple warpper to function sns_json_file_load
+     *
+     * */
     FILE *file=NULL;
     file = fopen(filename, "rb");
     if(file == NULL){
@@ -62,6 +71,11 @@ int sns_json_file_read(Sns **self, char *filename){
 }
 
 int sns_json_file_load(Sns **self, cJSON *data){
+    /*
+     * load SNS data from a JSON data
+     * *self must point to NULL
+     *
+     * */
     if(*self != NULL){
         return SNS_INITED_ERROR;
     }
@@ -211,6 +225,10 @@ int sns_json_file_load(Sns **self, cJSON *data){
 }
 
 struct _sns_json_pipe {
+    /*
+     * common pipe to store tmp value during map
+     *
+     * */
     cJSON *father_array;
     cJSON *father_object;
     int (*compar)(const void *, const void *);
@@ -235,6 +253,11 @@ int _sns_json_pipe_del(_Sns_json_pipe **_pipe){
 }
 
 int _sns_json_people_circle_formatter(const void *data, void *_pipe){
+    /*
+     * this function will be called by the map/traversal function
+     * param data will be formatted and then added to _pipe->father_array
+     *
+     * */
     _Sns_json_pipe *pipe=NULL;
     pipe = (_Sns_json_pipe*)_pipe;
     People *people=NULL;
@@ -245,6 +268,11 @@ int _sns_json_people_circle_formatter(const void *data, void *_pipe){
 }
 
 int _sns_json_people_tag_formatter(const void *data, void *_pipe){
+    /*
+     * this function will be called by the map/traversal function
+     * param data will be formatted and then added to _pipe->father_array
+     *
+     * */
     _Sns_json_pipe *pipe=NULL;
     pipe = (_Sns_json_pipe*)_pipe;
     Tag *tag=NULL;
@@ -255,6 +283,11 @@ int _sns_json_people_tag_formatter(const void *data, void *_pipe){
 }
 
 int _sns_json_people_formatter(const void *data, void *_pipe){
+    /*
+     * this function will be called by the map/traversal function
+     * param data will be formatted and then added to _pipe->father_array
+     *
+     * */
     _Sns_json_pipe *pipe=NULL;
     pipe = (_Sns_json_pipe*)_pipe;
     People *people=NULL;
@@ -303,6 +336,11 @@ int _sns_json_people_formatter(const void *data, void *_pipe){
 }
 
 int _sns_json_tag_formatter(const void *data, void *_pipe) {
+    /*
+     * this function will be called by the map/traversal function
+     * param data will be formatted and then added to _pipe->father_array
+     *
+     * */
     _Sns_json_pipe *pipe = NULL;
     pipe = (_Sns_json_pipe*)_pipe;
     Tag *tag = NULL;
@@ -320,6 +358,11 @@ int _sns_json_tag_formatter(const void *data, void *_pipe) {
 }
 
 int sns_json_file_write(Sns *self, char *filename){
+    /*
+     * store SNS `self`'s data into the selected file
+     * you can load this file by using `sns_json_file_read`
+     *
+     * */
     if(self == NULL){
         return SNS_UNINIT_ERROR;
     }
@@ -365,6 +408,11 @@ int sns_json_file_write(Sns *self, char *filename){
 }
 
 int sns_init(Sns **self){
+    /*
+     * create a null SNS
+     * *self must point to NULL
+     *
+     * */
     if(*self != NULL){
         return SNS_INITED_ERROR;
     }
@@ -401,6 +449,10 @@ int sns_del(Sns **self){
 }
 
 int _sns_create_dummy_people(People **self){
+    /*
+     * create a dummy people to call some special function
+     *
+     * */
     *self = (People*)malloc(sizeof(People));
     (*self)->id = 0;
     (*self)->_followings = NULL;
@@ -412,10 +464,19 @@ int _sns_create_dummy_people(People **self){
 }
 
 int sns_search_people(Sns *self, int id, People **result_people){
+    /*
+     * Search people in SNS `self` by id
+     *
+     * if found, *result_people will be set to the target people
+     *
+     * this function is a simple warpper to function set_search
+     *
+     * */
     if(self == NULL){
         return SNS_UNINIT_ERROR;
     }
 
+    // use a dummy people to call function set_search
     People *people=NULL;
     _sns_create_dummy_people(&people);
     people->id = id;
@@ -431,16 +492,29 @@ int sns_search_people(Sns *self, int id, People **result_people){
 }
 
 int _sns_create_dummy_tag(Tag **self){
+    /*
+     * create a dummy tag to call some special function
+     *
+     * */
     *self = (Tag*)malloc(sizeof(Tag));
     (*self)->id = 0;
     return SNS_OP_SUCCESS;
 }
 
 int sns_search_tag(Sns *self, int id, Tag **result_tag){
+    /*
+     * Search tag in SNS `self` by id
+     *
+     * if found, *result_tag will be set to the target tag
+     *
+     * this function is a simple warpper to function set_search
+     *
+     * */
     if(self == NULL){
         return SNS_UNINIT_ERROR;
     }
 
+    // use a dummy tag to call function set_search
     Tag *tag=NULL;
     _sns_create_dummy_tag(&tag);
     tag->id = id;
@@ -456,6 +530,13 @@ int sns_search_tag(Sns *self, int id, Tag **result_tag){
 }
 
 int sns_insert_people(Sns *self, People *people, int id_given){
+    /*
+     * Insert people into SNS `self`
+     * if id_given is FALSE, people's id will be assigned automaticly
+     *
+     * this function is a simple warpper to function set_insert
+     *
+     */
     if(self == NULL){
         return SNS_UNINIT_ERROR;
     }
@@ -482,6 +563,13 @@ int sns_insert_people(Sns *self, People *people, int id_given){
 }
 
 int sns_insert_tag(Sns *self, Tag *tag, int id_given){
+    /*
+     * Insert tag into SNS `self`
+     * if id_given is FALSE, people's id will be assigned automaticly
+     *
+     * this function is a simple warpper to function set_insert
+     *
+     */
     if (self == NULL) {
         return SNS_UNINIT_ERROR;
     }
@@ -508,6 +596,12 @@ int sns_insert_tag(Sns *self, Tag *tag, int id_given){
 }
 
 int sns_delete_people(Sns *self, People *people){
+    /*
+     * Delete people from SNS `self`
+     *
+     * this function is a simple warpper to function set_delete
+     *
+     */
     if(self == NULL){
         return SNS_UNINIT_ERROR;
     }
@@ -524,6 +618,12 @@ int sns_delete_people(Sns *self, People *people){
 }
 
 int sns_delete_tag(Sns *self, Tag *tag) {
+    /*
+     * Delete tag from SNS `self`
+     *
+     * this function is a simple warpper to function set_delete
+     *
+     */
     if (self == NULL) {
         return SNS_UNINIT_ERROR;
     }
@@ -540,6 +640,14 @@ int sns_delete_tag(Sns *self, Tag *tag) {
 }
 
 int sns_map_people(Sns *self, void *pipe, int (*callback)(const void *, void *)){
+    /*
+     * apply callback function to each people and the input param
+     *
+     * if the callback function's return value is not `SNS_OP_SUCCESS`, map will be aborted
+     *
+     * this function is a simple warpper to function set_map
+     *
+     * */
     int result;
     result = set_map(self->_peoples, pipe, callback);
     if(result != SET_OP_SUCCESS)return result;
@@ -547,6 +655,14 @@ int sns_map_people(Sns *self, void *pipe, int (*callback)(const void *, void *))
 }
 
 int sns_map_tag(Sns *self, void *pipe, int (*callback)(const void *, void *)){
+    /*
+     * apply callback function to each tag and the input param
+     *
+     * if the callback function's return value is not `SNS_OP_SUCCESS`, map will be aborted
+     *
+     * this function is a simple warpper to function set_map
+     *
+     * */
     int result;
     result = set_map(self->_tags, pipe, callback);
     if(result != SET_OP_SUCCESS)return result;
@@ -554,6 +670,13 @@ int sns_map_tag(Sns *self, void *pipe, int (*callback)(const void *, void *)){
 }
 
 int tag_init(Sns *universal, Tag **self, char name[100], int id, int id_given) {
+    /*
+     * create a TAG and associate it with SNS `self`
+     * *self must point to NULL
+     *
+     * if id_given is FALSE, people's id will be assigned automaticly
+     *
+     * */
     if (universal == NULL) {
         return SNS_UNINIT_ERROR;
     }
@@ -585,6 +708,10 @@ int tag_init(Sns *universal, Tag **self, char name[100], int id, int id_given) {
 }
 
 struct _people_common_pipe {
+    /*
+     * common pipe to store tmp value during map
+     *
+     * */
     People *self;
     Tag *self_tag;
     int refresh_shift;
@@ -613,6 +740,11 @@ int _people_common_pipe_del(_People_common_pipe **_pipe){
 }
 
 int _tag_del_refresh_set(const void *data, void *_pipe){
+    /*
+     * this function will be called by the map/traversal function
+     * param data will be deleted from _pipe->set_tag
+     *
+     * */
     _People_common_pipe *pipe;
     pipe = (_People_common_pipe*)_pipe;
     // data: People*
@@ -626,6 +758,10 @@ int _tag_del_refresh_set(const void *data, void *_pipe){
 }
 
 int tag_del(Sns *universal, Tag **self){
+    /*
+     * Delete tag from SNS `self`
+     *
+     * */
     if (universal == NULL) {
         return SNS_UNINIT_ERROR;
     }
@@ -654,6 +790,13 @@ int tag_del(Sns *universal, Tag **self){
 }
 
 int people_init(Sns *universal, People **self, char name[100], int id, int id_given){
+    /*
+     * create a TAG and associate it with SNS `self`
+     * *self must point to NULL
+     *
+     * if id_given is FALSE, people's id will be assigned automaticly
+     *
+     * */
     if(universal == NULL){
         return SNS_UNINIT_ERROR;
     }
@@ -674,6 +817,7 @@ int people_init(Sns *universal, People **self, char name[100], int id, int id_gi
     }
     strcpy((*self)->name, name);
 
+    // init inner SETs
     Set **wait_init=&((*self)->_followings);
     int i;
     int result;
@@ -696,6 +840,11 @@ int people_init(Sns *universal, People **self, char name[100], int id, int id_gi
 }
 
 int _people_del_refresh_set(const void *data, void *_pipe){
+    /*
+     * this function will be called by the map/traversal function
+     * people pipe->self will be deleted from the seletef set
+     *
+     * */
     _People_common_pipe *pipe;
     pipe = (_People_common_pipe*)_pipe;
     // data: People*
@@ -710,6 +859,10 @@ int _people_del_refresh_set(const void *data, void *_pipe){
 }
 
 int people_del(Sns *universal, People **self){
+    /*
+     * Delete tag from SNS `self`
+     *
+     * */
     if(universal == NULL){
         return SNS_UNINIT_ERROR;
     }
@@ -758,6 +911,10 @@ int people_del(Sns *universal, People **self){
 }
 
 int people_follow(People *self, People *target){
+    /*
+     * let `self` follow `target`
+     *
+     * */
     if(self == NULL || target == NULL){
         return PEOPLE_UNINIT_ERROR;
     }
@@ -772,6 +929,10 @@ int people_follow(People *self, People *target){
 }
 
 int people_unfollow(People *self, People *target){
+    /*
+     * delete `target` from `self`'s follow list
+     *
+     * */
     if(self == NULL || target == NULL){
         return PEOPLE_UNINIT_ERROR;
     }
@@ -786,6 +947,10 @@ int people_unfollow(People *self, People *target){
 }
 
 int people_friend(People *self, People *target){
+    /*
+     * let `self` add `target` as a friend
+     *
+     * */
     if(self == NULL || target == NULL){
         return PEOPLE_UNINIT_ERROR;
     }
@@ -800,6 +965,10 @@ int people_friend(People *self, People *target){
 }
 
 int people_unfriend(People *self, People *target){
+    /*
+     * delete `target` from `self`'s friend list
+     *
+     * */
     if(self == NULL || target == NULL){
         return PEOPLE_UNINIT_ERROR;
     }
@@ -814,6 +983,10 @@ int people_unfriend(People *self, People *target){
 }
 
 int people_tag(People *self, Tag *target){
+    /*
+     * add `target` to `self`'s tag list
+     *
+     * */
     if(self == NULL){
         return PEOPLE_UNINIT_ERROR;
     }
@@ -832,6 +1005,10 @@ int people_tag(People *self, Tag *target){
 }
 
 int people_untag(People *self, Tag *target){
+    /*
+     * delete `target` from `self`'s tag list
+     *
+     * */
     if(self == NULL){
         return PEOPLE_UNINIT_ERROR;
     }
@@ -906,6 +1083,15 @@ int people_tags(People *self, Set **tags){
 }
 
 int people_has_following(People *self, People *target, int *has_following){
+    /*
+     * Search `target` in `self`'s follow list
+     *
+     * if found, has_following will be set to TRUE
+     * if not, has_following will be set to FALSE
+     *
+     * this function is a simple warpper to function set_is_member
+     *
+     * */
     if(self == NULL || target == NULL){
         return PEOPLE_UNINIT_ERROR;
     }
@@ -918,6 +1104,15 @@ int people_has_following(People *self, People *target, int *has_following){
 }
 
 int people_has_follower(People *self, People *target, int *has_follower){
+    /*
+     * Search `self` in `target`'s follow list
+     *
+     * if found, has_follower will be set to TRUE
+     * if not, has_follower will be set to FALSE
+     *
+     * this function is a simple warpper to function set_is_member
+     *
+     * */
     if(self == NULL || target == NULL){
         return PEOPLE_UNINIT_ERROR;
     }
@@ -930,6 +1125,15 @@ int people_has_follower(People *self, People *target, int *has_follower){
 }
 
 int people_has_friend(People *self, People *target, int *has_friend){
+    /*
+     * Search `target` in `self`'s friend list
+     *
+     * if found, has_friend will be set to TRUE
+     * if not, has_friend will be set to FALSE
+     *
+     * this function is a simple warpper to function set_is_member
+     *
+     * */
     if(self == NULL || target == NULL){
         return PEOPLE_UNINIT_ERROR;
     }
@@ -942,6 +1146,15 @@ int people_has_friend(People *self, People *target, int *has_friend){
 }
 
 int people_has_tag(People *self, Tag *target, int *has_tag){
+    /*
+     * Search `target` in `self`'s tag list
+     *
+     * if found, has_tag will be set to TRUE
+     * if not, has_tag will be set to FALSE
+     *
+     * this function is a simple warpper to function set_is_member
+     *
+     * */
     if(self == NULL){
         return PEOPLE_UNINIT_ERROR;
     }
@@ -958,6 +1171,10 @@ int people_has_tag(People *self, Tag *target, int *has_tag){
 }
 
 int people_common_followings(People *self, People *target, Set **common_followings){
+    /*
+     * return a SET containing peoples that `self` and `target` both follow
+     *
+     * */
     if(self == NULL || target == NULL){
         return PEOPLE_UNINIT_ERROR;
     }
@@ -972,6 +1189,10 @@ int people_common_followings(People *self, People *target, Set **common_followin
 }
 
 int people_common_followers(People *self, People *target, Set **common_followers){
+    /*
+     * return a SET containing peoples that follows `self` and `target`
+     *
+     * */
     if(self == NULL || target == NULL){
         return PEOPLE_UNINIT_ERROR;
     }
@@ -986,6 +1207,10 @@ int people_common_followers(People *self, People *target, Set **common_followers
 }
 
 int people_common_tags(People *self, People *target, Set **common_tags){
+    /*
+     * return a SET containing tags that `self` and `target` both have
+     *
+     * */
     if(self == NULL || target == NULL){
         return PEOPLE_UNINIT_ERROR;
     }
@@ -1000,6 +1225,11 @@ int people_common_tags(People *self, People *target, Set **common_tags){
 }
 
 int _people_extend_friends(const void *data, void *_pipe){
+    /*
+     * this function will be called by the map/traversal function
+     * param data(people) will be inserted into SET pipe->result_set
+     *
+     * */
     _People_common_pipe *pipe=NULL;
     pipe = (_People_common_pipe*)_pipe;
     People *friend=NULL;
@@ -1013,6 +1243,10 @@ int _people_extend_friends(const void *data, void *_pipe){
 }
 
 int people_extend_friends(People *self, Set **extend_friends){
+    /*
+     * return a SET containing peoples who is `self`'s friends' friend and isn't `self`'s friend
+     *
+     * */
     if(self == NULL){
         return PEOPLE_UNINIT_ERROR;
     }

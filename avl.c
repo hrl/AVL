@@ -1,6 +1,7 @@
 //
 // Created by hrl on 9/9/15.
 //
+// AVL function lib
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -15,6 +16,12 @@ int _max(int a, int b){
 }
 
 int avl_init(Tree **self, void *data) {
+    /*
+     * init an empty AVL Tree
+     * *self must point to NULL
+     * (*self)->data need to be set immediately after call this function
+     *
+     * */
     if(*self != NULL){
         return TREE_INITED_ERROR;
     }
@@ -32,6 +39,10 @@ int avl_init(Tree **self, void *data) {
 }
 
 int avl_del(Tree **self){
+    /*
+     * recursively delete(free) an AVL Tree
+     *
+     * */
     if((*self) == NULL){
         return TREE_OP_SUCCESS;
     }
@@ -52,6 +63,15 @@ int avl_height_direct(Tree *self){
 }
 
 int avl_search(Tree *self, void *data, void **result_data, int *result_found, int (*compar)(const void *, const void *)){
+    /*
+     * Search data in AVL Tree `self`
+     * data in param and data in AVL struct will be compared in function compar
+     *
+     * if found, *result_data will be set to the target data
+     *           result_found will be set to TRUE
+     * if not, result_found will be set to FALSE
+     *
+     * */
     if(self == NULL){
         return TREE_UNINIT_ERROR;
     }
@@ -72,6 +92,9 @@ int avl_search(Tree *self, void *data, void **result_data, int *result_found, in
 }
 
 int _avl_single_rotate_with_left(Tree **self){
+    /*
+     * inner function to rotate AVL Tree when insert/delete member in AVL Tree
+     * */
     Tree *tmp;
     tmp = (*self)->left;
     (*self)->left = tmp->right;
@@ -112,6 +135,11 @@ int _avl_double_rotate_with_right(Tree **self){
 }
 
 int avl_insert(Tree **self, void *data, int (*compar)(const void *, const void *)){
+    /*
+     * Insert data into AVL Tree `self`
+     * data in param and data in AVL struct will be compared in function compar
+     *
+     */
     if(*self == NULL){
         return avl_init(self, data);
     }
@@ -124,11 +152,14 @@ int avl_insert(Tree **self, void *data, int (*compar)(const void *, const void *
     }
     if(compar_result < 0){
         if((*self)->left == NULL){
+            // left child is empty, just init an AVL Tree
             result = avl_init(&((*self)->left), data);
             if(result != TREE_OP_SUCCESS)return TREE_INSERT_FAIL_ERROR;
         } else {
+            // recursively insert into left child
             result = avl_insert(&((*self)->left), data, compar);
             if(result != TREE_OP_SUCCESS)return result;
+            // rotate AVL Tree
             if(avl_height_direct((*self)->left) - avl_height_direct((*self)->right) == 2){
                 if((*compar)(data, (*self)->left->data) < 0){
                     result = _avl_single_rotate_with_left(self);
@@ -155,12 +186,14 @@ int avl_insert(Tree **self, void *data, int (*compar)(const void *, const void *
             }
         }
     }
+    // update height according to sub tree
     (*self)->height = _max(avl_height_direct((*self)->left), avl_height_direct((*self)->right)) + 1;
 
     return TREE_OP_SUCCESS;
 }
 
 int _avl_rotate(Tree **self){
+    // choose rotate type according to AVL Tree's height
     if(avl_height_direct((*self)->left) - avl_height_direct((*self)->right) == 2){
         if(avl_height_direct((*self)->left->left) > avl_height_direct((*self)->left->right)){
             return _avl_single_rotate_with_left(self);
@@ -177,6 +210,14 @@ int _avl_rotate(Tree **self){
 }
 
 int avl_delete(Tree **self, void *data, int *deleted, int (*compar)(const void *, const void *)){
+    /*
+     * Delete data from AVL Tree `self`
+     * data in param and data in AVL struct will be compared in function compar
+     *
+     * if success found and deleted the target data, deleted will be set to TRUE
+     * if not, deleted will be set to FALSE
+     *
+     */
     if(*self == NULL){
         return TREE_UNINIT_ERROR;
     }
@@ -185,6 +226,7 @@ int avl_delete(Tree **self, void *data, int *deleted, int (*compar)(const void *
 
     int compar_result=(*compar)(data, (*self)->data);
     if(compar_result == 0){
+        // delete current Node
         if((*self)->right == NULL){
             Tree *need_free;
             need_free = *self;
@@ -224,6 +266,7 @@ int avl_delete(Tree **self, void *data, int *deleted, int (*compar)(const void *
         if(result != TREE_OP_SUCCESS)return result;
     }
 
+    // re balance the AVL Tree
     if((*self)->left != NULL){
         result = _avl_rotate(&((*self)->left));
         if(result != TREE_OP_SUCCESS)return result;
@@ -236,11 +279,19 @@ int avl_delete(Tree **self, void *data, int *deleted, int (*compar)(const void *
         result = _avl_rotate(self);
         if(result != TREE_OP_SUCCESS)return result;
     }
+    // update AVL Tree's height
     (*self)->height = _max(avl_height_direct((*self)->left), avl_height_direct((*self)->right)) + 1;
     return TREE_OP_SUCCESS;
 }
 
 int avl_pre_order_traversal(Tree *self, void *pipe, int (*callback)(const void *, void *)){
+    /*
+     * traversal whole AVL Tree in pre order
+     * apply callback function to each Node's data and the input param pipe during traversal
+     *
+     * if the callback function's return value is not `TREE_OP_SUCCESS`, traversal will be aborted
+     *
+     * */
     if(self == NULL){
         return TREE_UNINIT_ERROR;
     }
